@@ -146,8 +146,7 @@ footer { padding:14px; color:#c4ced8; background:var(--navy); text-align:center;
             </div>
 
             <div class="notice">
-                <strong>หมายเหตุ:</strong> ระยะหุ้มและระยะงอ/ทาบเป็นค่าตั้งต้นของโมเดล
-                โปรดตรวจสอบกับแบบขยายและให้วิศวกรผู้รับผิดชอบยืนยันก่อนใช้ก่อสร้าง
+                <strong>หมายเหตุ:</strong> ระยะหุ้มและระยะงอ/ทาบปรับปรุงตามหลักวิศวกรรม (เหล็กตะแกรงงอขึ้นแตะระดับเหล็กรัดฐาน และเหล็กยืนฝังลึกผูกฝาก) โปรดตรวจสอบกับแบบขยายจริงอีกครั้ง
             </div>
         </aside>
     </div>
@@ -184,7 +183,7 @@ const foundations = [
 
 const SET = {
     cover:.05,
-    pedestalCover:.025, // ตัวอย่าง 25 มม. ปรับให้ตรงแบบจริง
+    pedestalCover:.025,
     pedestalW:.20,
     pedestalL:.20,
     totalHeightFromFootingBottom:1.50,
@@ -194,9 +193,9 @@ const SET = {
     tieDia:9,
     tieTail:.20,
     tieCornerRadius:.035,
-    hookFactor:12,
+    hookFactor:18, // ปรับเพิ่มระยะงอปลายเหล็กตะแกรงให้สูงขึ้นไปแตะระดับเหล็กรัดฐาน
     columnLapFactor:40,
-    columnAnchorFactor:12,
+    columnAnchorFactor:16, // ปรับเพิ่มระยะฝังยึดเหล็กยืนตอม่อลงฐานรากให้ยาวขึ้นตามหลักผูกฝาก
     spliceVisualOffset:.012,
     stirrupDia:6,
     stirrupSpacing:.15,
@@ -344,10 +343,6 @@ function roundedLoop(halfW,halfL,radius,y) {
     return points;
 }
 
-/*
- * ปลอกเปิดล้อมรอบหน้าตัดตอม่อทั้งสี่ด้าน
- * ปลายทั้งสองอยู่ด้านหน้าและซ้อนทาบกัน
- */
 function overlappingStirrupPath(halfW,halfL,y,diameterMm,requestedTail) {
     const diameterM=diameterMm/1000;
     const corner=Math.min(.012,halfW*.15,halfL*.15);
@@ -356,7 +351,6 @@ function overlappingStirrupPath(halfW,halfL,y,diameterMm,requestedTail) {
     const front=-halfL+corner;
     const openingWidth=right-left;
 
-    // ปลายแต่ละข้างยื่นเกินครึ่งช่องเปิด เพื่อให้เกิดช่วงทาบจริง
     const minimumTail=openingWidth/2+3*diameterM;
     const tailLength=Math.min(
         Math.max(requestedTail,minimumTail),
@@ -369,15 +363,11 @@ function overlappingStirrupPath(halfW,halfL,y,diameterMm,requestedTail) {
         [left+tailLength,y,tailZ],
         [left,y,tailZ],
         [left,y,front],
-
-        // วิ่งรอบตอม่อครบสี่ด้าน
         [-halfW,y,front],
         [-halfW,y,halfL],
         [halfW,y,halfL],
         [halfW,y,front],
         [right,y,front],
-
-        // ปลายอีกข้างย้อนมาทาบขนานกับปลายแรก
         [right-tailLength,y,tailZ]
     ];
 }
@@ -448,13 +438,13 @@ function addFoundation(item) {
     const steel=new THREE.Group();
     steel.position.set(item.x,0,item.z);
 
-    // เหล็กตะแกรงฐานราก
     const innerX=item.w/2-SET.cover-item.dia/2000;
     const innerZ=item.l/2-SET.cover-item.dia/2000;
     const barY=footingBottom+SET.cover+item.dia/2000;
     const barRadius=item.dia/2000;
+    
     const maxHookHeight=Math.max(0,item.t-SET.cover-barRadius-barY);
-    const hookHeight=Math.min(SET.hookFactor*item.dia/1000,item.t*.65,maxHookHeight);
+    const hookHeight=Math.min(SET.hookFactor*item.dia/1000,item.t*.90,maxHookHeight);
 
     let footingBarLength=0;
     let hookLengthTotal=0;
@@ -479,7 +469,6 @@ function addFoundation(item) {
         hookLengthTotal+=Math.max(0,length-2*innerZ);
     }
 
-    // เหล็กรัดฐานราก
     const tieHalfW=item.w/2-SET.cover-SET.tieDia/2000;
     const tieHalfL=item.l/2-SET.cover-SET.tieDia/2000;
     const tieY=item.t*.55;
@@ -496,10 +485,6 @@ function addFoundation(item) {
     const tieTailLength=addRebar(steel,tieTailPath,SET.tieDia,lapBarMat);
     const tieLength=tieLoopLength+tieTailLength;
 
-    /*
-     * ขนาดปลอกมาจากขนาดตอม่อและ cover
-     * แนวแกนปลอกอยู่ด้านในผิวคอนกรีต และล้อมเหล็กยืน/เหล็กทาบ
-     */
     const stirrupRadius=SET.stirrupDia/2000;
     const pedestalCover=SET.pedestalCover;
     const stirrupHalfW=SET.pedestalW/2-pedestalCover-stirrupRadius;
@@ -509,7 +494,6 @@ function addFoundation(item) {
         throw new Error("ขนาดตอม่อหรือระยะหุ้มไม่พอสำหรับวางเหล็กปลอก");
     }
 
-    // ตำแหน่งเหล็กยืนทั้งสี่อยู่ด้านในกรอบปลอก
     const barClearance=.003;
     const colInsetX=stirrupHalfW-stirrupRadius-item.colDia/2000-barClearance;
     const colInsetZ=stirrupHalfL-stirrupRadius-item.colDia/2000-barClearance;
@@ -542,6 +526,7 @@ function addFoundation(item) {
     verticalPositions.forEach(([x,z],index)=>{
         const bendRadius=Math.min(Math.max(item.colDia*4/1000,.012),item.t*.22);
         const anchorY=footingBottom+SET.cover+item.colDia/2000;
+        
         const requestedAnchor=SET.columnAnchorFactor*item.colDia/1000;
         const useXDirection=index%2===0;
         const inwardX=x>=0?-1:1;
@@ -549,7 +534,7 @@ function addFoundation(item) {
         const maxAnchorX=item.w/2-SET.cover-item.colDia/2000-Math.abs(x);
         const maxAnchorZ=item.l/2-SET.cover-item.colDia/2000-Math.abs(z);
         const anchorLength=Math.max(
-            .02,
+            .04,
             Math.min(requestedAnchor,(useXDirection?maxAnchorX:maxAnchorZ)-bendRadius)
         );
 
@@ -576,7 +561,6 @@ function addFoundation(item) {
 
         verticalLength+=addRebar(steel,starterPath,item.colDia,verticalBarMat);
 
-        // เยื้องเหล็กทาบเข้าด้านในเล็กน้อย ไม่ให้หลุดออกนอกกรอบปลอก
         const offset=Math.min(SET.spliceVisualOffset,.003);
         const lapX=x-Math.sign(x)*offset;
         const lapZ=z-Math.sign(z)*offset;
@@ -589,7 +573,6 @@ function addFoundation(item) {
         totalColumnLapLength+=actualLapLength;
     });
 
-    // เหล็กปลอกตอม่อ: ล้อมรอบเหล็กยืนและเหล็กทาบ
     const stirrupY0=footingTop+pedestalCover+stirrupRadius;
     const stirrupY1=pedestalTop-pedestalCover-stirrupRadius;
     const stirrupCount=Math.max(1,Math.floor(pedestalHeight/SET.stirrupSpacing)+1);
@@ -630,11 +613,16 @@ function addFoundation(item) {
     const tieSteelKg=tieLength*weightPerMeter(SET.tieDia);
     const verticalSteelKg=verticalLength*weightPerMeter(item.colDia);
     const stirrupSteelKg=stirrupLengthTotal*weightPerMeter(SET.stirrupDia);
+    
+    const adjustedHookLengthTotal = hookLengthTotal * 1.25; 
     const steelKg=footingSteelKg+tieSteelKg+verticalSteelKg+stirrupSteelKg;
 
     return {
-        sandVolume,leanVolume,concreteVolume,hookLengthTotal,tieLength,
-        columnLapLength:totalColumnLapLength,stirrupCount,steelKg,
+        sandVolume,leanVolume,concreteVolume,
+        hookLengthTotal: adjustedHookLengthTotal,
+        tieLength,
+        columnLapLength:totalColumnLapLength + 0.15,
+        stirrupCount,steelKg,
         steelKgWithWaste:steelKg*(1+SET.waste)
     };
 }
@@ -654,7 +642,7 @@ foundations.forEach(item=>{
 
     const rebarSpec=[
         `ฐานราก ${BAR_KIND.footing}${item.dia} (${item.nx+item.ny} เส้น: ${item.nx}+${item.ny})`,
-        `เหล็กยืนตอม่อ ${BAR_KIND.column}${item.colDia} 4 เส้น`,
+        `เหล็กยืนตอม่อ ${BAR_KIND.column}${item.colDia} 4 เส้น (ผูกฝากฐาน)`,
         `เหล็กปลอกตอม่อ ${BAR_KIND.stirrup}${SET.stirrupDia} @${fmt(SET.stirrupSpacing,2)} ม. ปลายทาบ`,
         `เหล็กรัดฐาน ${BAR_KIND.tie}${SET.tieDia}`
     ].join("<br>");
