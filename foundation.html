@@ -101,7 +101,7 @@
 
         .viewer-layout {
             display: grid;
-            grid-template-columns: 1fr 500px;
+            grid-template-columns: 1fr 520px;
             gap: 1.5rem;
         }
 
@@ -229,7 +229,7 @@
         table.boq-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             text-align: left;
         }
 
@@ -304,7 +304,7 @@
     <header>
         <div class="header-container">
             <div class="header-title-group">
-                <h1><i class="fa-solid fa-layer-group"></i> แปลงฐานราก 3 มิติ (BIM Full BOQ Dashboard)</h1>
+                <h1><i class="fa-solid fa-layer-group"></i> แปลงฐานราก 3 มิติ (BIM Precision QTO & Rebar Engine)</h1>
             </div>
             <a href="index.html" class="btn-back">
                 <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
@@ -318,7 +318,7 @@
             <!-- 3D Canvas Box -->
             <div class="canvas-container">
                 <div class="canvas-overlay-tip">
-                    <i class="fa-solid fa-check-circle"></i> แสดงโมเดลเหล็กรัดรอบพร้อมงอปลายล็อกมุมและถอดแบบอัตโนมัติ
+                    <i class="fa-solid fa-check-circle"></i> แสดงเหล็กรัดรอบพร้อมงอปลายล็อกมุม 3 มิติ และถอดแบบ BOQ อัตโนมัติ
                 </div>
                 <div id="webgl-canvas"></div>
                 <div class="canvas-toolbar">
@@ -330,7 +330,7 @@
             <!-- BOQ Table & Summary Panel -->
             <div class="info-panel">
                 <div class="panel-header">
-                    <h3><i class="fa-solid fa-table-list"></i> รายการถอดแบบปริมาณงาน (BOQ) ทุกต้น</h3>
+                    <h3><i class="fa-solid fa-table-list"></i> รายการถอดแบบปริมาณงาน (BOQ) แม่นยำทุกต้น</h3>
                 </div>
 
                 <div class="boq-table-container">
@@ -338,8 +338,8 @@
                         <thead>
                             <tr>
                                 <th>Grid</th>
-                                <th>ฐานราก</th>
-                                <th>เหล็กหลัก</th>
+                                <th>ขนาด (ม.)</th>
+                                <th>เหล็กฐานราก</th>
                                 <th>ปูน (m³)</th>
                                 <th>เหล็กรวม (kg)</th>
                             </tr>
@@ -353,7 +353,7 @@
                 <div class="info-card">
                     <h4>สรุปยอดรวมทั้งโครงการ (14 ต้น)</h4>
                     <div class="info-row"><span class="info-label">ปริมาตรคอนกรีตฐานรากรวม:</span><span class="info-value" id="total-conc-vol" style="color:#0284c7;">- m³</span></div>
-                    <div class="info-row"><span class="info-label">น้ำหนักเหล็กเสริมรวม (เผื่อ 7%):</span><span class="info-value" id="total-rebar-weight" style="color:#b45309; font-size:1rem;">- kg</span></div>
+                    <div class="info-row"><span class="info-label">น้ำหนักเหล็กเสริมรวม (เผื่อ Waste 7%):</span><span class="info-value" id="total-rebar-weight" style="color:#b45309; font-size:1rem;">- kg</span></div>
                 </div>
             </div>
 
@@ -365,7 +365,7 @@
     </footer>
 
     <script>
-        // ข้อมูลสเปกฐานรากตรงตามแบบแปลน 100%[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span)[span_2](start_span)[span_2](end_span)
+        // ข้อมูลสเปกฐานรากตรงตามแบบโครงสร้างจริง 100%
         const detailedFoundationData = {
             "A1": { name: "F0.60x0.60", col: "C1", thick: 0.20, width: 0.60, length: 0.60, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 },
             "A2": { name: "F0.60x0.60", col: "C1", thick: 0.20, width: 0.60, length: 0.60, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 },
@@ -389,6 +389,7 @@
 
         const unitWeight = { 6: 0.222, 9: 0.499, 12: 0.888, 16: 1.578 };
 
+        // ฟังก์ชันคำนวณถอดแบบทางวิศวกรรมที่แม่นยำ (คำนึงถึงคอนกรีตหุ้ม Concrete Cover 5 ซม. + ระยะงอปลายเหล็กตะแกรง + เหล็กรัดรอบ + เหล็กเสาตอม่อ)
         function calculateEngineeringSpecs(id) {
             const data = detailedFoundationData[id];
             const w = data.width;
@@ -397,29 +398,36 @@
             const db = data.db;
             const colDb = data.colDb;
 
-            const hookM = (12 * db) / 1000;
-            const lapM = (40 * colDb) / 1000;
+            const cover = 0.05; // คอนกรีตหุ้ม 5 ซม. ซ้าย/ขวา
+            const netW = w - (2 * cover);
+            const netL = l - (2 * cover);
+
+            const hookM = (12 * db) / 1000; // ระยะงอปลาย 12db
+            const lapM = (40 * colDb) / 1000; // ระยะทาบเหล็กเสา 40db
             
-            const lenX = (w - 0.10) + (2 * hookM);
-            const lenY = (l - 0.10) + (2 * hookM);
+            // 1. เหล็กตะแกรงฐานราก (2 ทาง X และ Y) พร้อมงอปลาย 2 ข้าง
+            const lenX = netW + (2 * hookM);
+            const lenY = netL + (2 * hookM);
             const totalFootingRebarLen = (data.countX * lenX) + (data.countY * lenY);
             const footingRebarWeight = totalFootingRebarLen * unitWeight[db];
 
-            // คำนวณเหล็กรัดรอบรอบฐานรากพร้อมระยะทาบงอปลาย
-            const tiePerimeter = 2 * ((w - 0.10) + (l - 0.10)) + 0.30;
+            // 2. เหล็กรัดรอบฐานราก (Tie Rebar รอบตะแกรง พร้อมระยะทาบ 15 ซม.)
+            const tiePerimeter = 2 * (netW + netL) + 0.15;
             const tieWeight = tiePerimeter * unitWeight[9];
 
+            // 3. เหล็กยืนเสาตอม่อ (4 เส้น + ระยะทาบฐานราก + ระยะฝังลึก)
             const colHeight = 1.50 + lapM + 0.20;
-            const totalColRebarLen = 4 * colHeight;
+            const totalColRebarLen = data.colCount * colHeight;
             const colRebarWeight = totalColRebarLen * unitWeight[colDb];
 
+            // 4. เหล็กปลอกเสาตอม่อ (Spacing @ 0.15 ม.) พร้อมงอปลาย 135°
             const colStirrupCount = Math.ceil((1.50 - th) / 0.15);
             const stirrupPerimeter = (2 * (0.20 + 0.20) - 0.08) + 0.15;
             const totalStirrupLen = colStirrupCount * stirrupPerimeter;
             const stirrupWeight = totalStirrupLen * unitWeight[6];
 
             const rawWeight = footingRebarWeight + tieWeight + colRebarWeight + stirrupWeight;
-            const finalWeight = (rawWeight * 1.07).toFixed(1);
+            const finalWeight = (rawWeight * 1.07).toFixed(1); // เผื่อเศษตัดต่อ Waste 7%
             const concVol = (w * l * th).toFixed(3);
 
             return {
@@ -602,7 +610,7 @@
             cEdges.position.copy(colMesh.position);
             group.add(cEdges);
 
-            // ลูกปูนหนุนคอนกรีต (Spacer Block)
+            // ลูกปูนหนุนคอนกรีต 5 ซม. (Spacer Block)
             const cover = 0.05;
             const innerHalfW = halfW - cover;
             const innerHalfL = halfL - cover;
@@ -623,8 +631,9 @@
 
             const stepX = (innerHalfL * 2) / (data.countX - 1);
             const stepY = (innerHalfW * 2) / (data.countY - 1);
-            const hookH = th * 0.6;
+            const hookH = th * 0.6; // ระยะดัดงอปลายตั้งฉากขึ้นด้านบน
 
+            // ตะแกรงแกน X พร้อมงอปลาย
             for(let i = 0; i < data.countX; i++) {
                 const offsetZ = -innerHalfL + (i * stepX);
                 const p1 = new THREE.Vector3(-innerHalfW, 0.13, offsetZ);
@@ -637,6 +646,7 @@
                 rebarGroup.add(createCylinderBetweenPoints(p2, p4, rebarRadius, rebarMaterial));
             }
 
+            // ตะแกรงแกน Z พร้อมงอปลาย
             for(let i = 0; i < data.countY; i++) {
                 const offsetX = -innerHalfW + (i * stepY);
                 const p1 = new THREE.Vector3(offsetX, 0.15, -innerHalfL);
@@ -649,9 +659,9 @@
                 rebarGroup.add(createCylinderBetweenPoints(p2, p4, rebarRadius, rebarMaterial));
             }
 
-            // --- เหล็กรัดรอบ 1-Ø9 มม. พร้อมงอปลายล็อกมุม (Lap/Hook Splice 3D) ---
+            // --- โมเดลเหล็กรัดรอบ 3 มิติ (Tie Rebar รอบฐานราก พร้อมงอปลายล็อกมุม 15 ซม.) ---
             const tieY = 0.14;
-            const tieOverlap = 0.15; // ระยะทาบงอปลาย 15 ซม.
+            const tieOverlap = 0.15; 
             const t1 = new THREE.Vector3(-innerHalfW, tieY, -innerHalfL);
             const t2 = new THREE.Vector3(innerHalfW, tieY, -innerHalfL);
             const t3 = new THREE.Vector3(innerHalfW, tieY, innerHalfL);
@@ -666,7 +676,7 @@
 
             group.add(rebarGroup);
 
-            // โครงเหล็กเสาตอม่อ 3D
+            // โครงเหล็กเสาตอม่อ 3D พร้อมเหล็กปลอกและงอปลาย 135°
             const colRebarGroup = new THREE.Group();
             const colRebarRadius = (data.colDb / 2000) * 2.2;
             const stirrupRadius = (6 / 2000) * 2.2;
@@ -712,11 +722,11 @@
             grandTotalWeight += specs.weight;
             grandTotalVolume += specs.volume;
 
-            // บรรจุข้อมูลทุกต้นลงในตาราง BOQ อัตโนมัติทันที
+            // บรรจุข้อมูลแสดงผลลงในตาราง BOQ อัตโนมัติทันที
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td><b>Grid ${pos.id}</b></td>
-                <td>${data.name}</td>
+                <td>${data.width}x${data.length}x${data.thick}</td>
                 <td>${data.countX}+${data.countY} ${data.rebarType}</td>
                 <td>${specs.volume.toFixed(3)}</td>
                 <td style="color:#b45309; font-weight:600;">${specs.weight.toFixed(1)}</td>
