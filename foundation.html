@@ -306,7 +306,7 @@
             <!-- 3D Canvas Box -->
             <div class="canvas-container">
                 <div class="canvas-overlay-tip">
-                    <i class="fa-solid fa-computer-mouse"></i> คลิกเลือกฐานรากเพื่อตรวจแท่งเหล็กทรงกระบอก, ลูกปูนรอง และผิวทราย/คอนกรีต
+                    <i class="fa-solid fa-computer-mouse"></i> คลิกเลือกฐานรากเพื่อตรวจเหล็กรัดรอบงอปลายล็อกมุม
                 </div>
                 <div id="webgl-canvas"></div>
                 <div class="canvas-toolbar">
@@ -327,15 +327,15 @@
                     <div class="info-row"><span class="info-label">ขนาดฐานราก (กxยxหนา):</span><span class="info-value" id="val-size">-</span></div>
                     <div class="info-row"><span class="info-label">ความลึกฐานราก (ถึงท้องฐาน):</span><span class="info-value" id="val-depth">1.50 ม. (ใต้ระดับดินเดิม)</span></div>
                     <div class="info-row"><span class="info-label">เหล็กตะแกรงฐานราก:</span><span class="info-value" id="val-rebar">-</span></div>
-                    <div class="info-row"><span class="info-label">ระยะงอปลายเหล็ก ($12d_b$):</span><span class="info-value" id="val-hook">-</span></div>
-                    <div class="info-row"><span class="info-label">เหล็กรัดรอบ ($1\text{-}\varnothing9$ มม.):</span><span class="info-value" id="val-tie">-</span></div>
-                    <div class="info-row"><span class="info-label">เหล็กหลักเสา + ทาบ ($40d_b$):</span><span class="info-value" id="val-col-rebar">-</span></div>
-                    <div class="info-row"><span class="info-label">เหล็กปลอกเสา + งอ $135^\circ$:</span><span class="info-value" id="val-stirrup">-</span></div>
+                    <div class="info-row"><span class="info-label">ระยะงอปลายเหล็ก (12d<sub>b</sub>):</span><span class="info-value" id="val-hook">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กรัดรอบ (1-&Oslash;9 มม.):</span><span class="info-value" id="val-tie">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กหลักเสา + ทาบ (40d<sub>b</sub>):</span><span class="info-value" id="val-col-rebar">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กปลอกเสา + งอ 135&deg;:</span><span class="info-value" id="val-stirrup">-</span></div>
                     <div class="info-row"><span class="info-label">ปริมาตรคอนกรีตฐานราก:</span><span class="info-value" id="val-vol-conc">- m³</span></div>
                     <div class="info-row"><span class="info-label">น้ำหนักเหล็กรวมจุดนี้ (เผื่อ 7%):</span><span class="info-value" id="val-weight" style="color:#b45309; font-size:0.95rem;">- kg</span></div>
 
                     <div class="tech-spec-box">
-                        <i class="fa-solid fa-shield-halved"></i> <b>มาตรฐาน BIM 3D:</b> แสดงเหล็กทรงกระบอกหนาตามขนาดจริง ($dB$), มีลูกปูนหนุน (Concrete Spacer 5 ซม.) และพื้นผิวทราย/คอนกรีตรองพื้นขรุขระ (Procedural Bump Map)
+                        <i class="fa-solid fa-shield-halved"></i> <b>มาตรฐาน BIM 3D:</b> เหล็กรัดรอบ 1-&Oslash;9 มม. มีการงอปลายเหล็ก (Lap/Hook Splice 3D) ล็อกมุมสมจริงตามหลักงานโครงสร้าง พร้อมลูกปูนรอง 5 ซม.
                     </div>
                 </div>
 
@@ -354,7 +354,7 @@
     </footer>
 
     <script>
-        // ข้อมูลสเปกฐานรากตรงตามแบบแปลน 100%[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)
+        // ข้อมูลสเปกฐานรากตรงตามแบบแปลน 100%
         const detailedFoundationData = {
             "A1": { name: "F0.60x0.60", col: "C1", thick: 0.20, width: 0.60, length: 0.60, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 },
             "A2": { name: "F0.60x0.60", col: "C1", thick: 0.20, width: 0.60, length: 0.60, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 },
@@ -422,7 +422,7 @@
             };
         }
 
-        // --- ข้อ 3: ฟังก์ชันสร้าง Procedural Noise Texture สำหรับมิติผิวทรายขรุขระและคอนกรีตหยาบ ---
+        // Procedural Noise Texture สำหรับพื้นผิวขรุขระ
         function createNoiseTexture(density, opacity) {
             const canvas = document.createElement('canvas');
             canvas.width = 256;
@@ -480,7 +480,7 @@
         dirLight.shadow.mapSize.height = 2048;
         scene.add(dirLight);
 
-        // --- ข้อ 3: เลเยอร์ชั้นทรายหยาบอัดแน่น & คอนกรีตหยาบ ใส่ Texture Bump Map ขรุขระ ---
+        // ชั้นทรายหยาบอัดแน่น & คอนกรีตหยาบ
         const sandGeo = new THREE.BoxGeometry(10, 0.10, 14);
         const sandMat = new THREE.MeshStandardMaterial({ 
             color: 0xc2a679, 
@@ -545,14 +545,10 @@
 
         const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x334155, linewidth: 1.5 });
         
-        // วัสดุเหล็ก 3D ทรงกระบอกมีแสงเงาสมจริง
         const rebarMaterial = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.35, metalness: 0.75 });
         const colRebarMaterial = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.35, metalness: 0.75 });
-        
-        // --- ข้อ 2: วัสดุก้อนลูกปูนรองสเปกตรัม (Spacer Block) ---
         const spacerMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9, metalness: 0.1 });
 
-        // --- ข้อ 1: ฟังก์ชันสร้างเหล็กแท่งทรงกระบอก 3D (Cylinder Rebar Geometry) ---
         function createCylinderBetweenPoints(p1, p2, radius, material) {
             const direction = new THREE.Vector3().subVectors(p2, p1);
             const height = direction.length();
@@ -604,14 +600,14 @@
             cEdges.position.copy(colMesh.position);
             group.add(cEdges);
 
-            // --- ข้อ 2: วางลูกปูนหนุนคอนกรีต (Concrete Spacers 5 ซม.) ใต้ตะแกรง 4 มุม ---
-            const cover = 0.05; // 5.0 ซม. ตามสเปก
+            // ลูกปูนหนุนคอนกรีต (Spacer Block)
+            const cover = 0.05;
             const innerHalfW = halfW - cover;
             const innerHalfL = halfL - cover;
             
             [-innerHalfW + 0.08, innerHalfW - 0.08].forEach(sx => {
                 [-innerHalfL + 0.08, innerHalfL - 0.08].forEach(sz => {
-                    const spacerGeo = new THREE.BoxGeometry(0.05, 0.05, 0.05); // ก้อนลูกปูนขนาด 5x5x5 ซม.
+                    const spacerGeo = new THREE.BoxGeometry(0.05, 0.05, 0.05);
                     const spacer = new THREE.Mesh(spacerGeo, spacerMat);
                     spacer.position.set(sx, 0.10 + 0.025, sz);
                     spacer.castShadow = true;
@@ -619,18 +615,15 @@
                 });
             });
 
-            // --- ข้อ 1: สร้างแท่งเหล็กตะแกรงทรงกระบอก 3D หนาตามขนาดจริง ($dB$) ---
             const rebarGroup = new THREE.Group();
-            
-            // คำนวณรัศมีเหล็กจริงตามสเกล 3D (คูณ 2.2 เพื่อให้เห็นความหนามีมิติสวยงาม)
             const rebarRadius = (data.db / 2000) * 2.2; 
             const tieRadius = (9 / 2000) * 2.2;
 
             const stepX = (innerHalfL * 2) / (data.countX - 1);
             const stepY = (innerHalfW * 2) / (data.countY - 1);
-            const hookH = th * 0.6; // ระยะงอปลาย Hook
+            const hookH = th * 0.6;
 
-            // ตะแกรงแกน X พร้อมปลายงอ $90^\circ$
+            // ตะแกรงแกน X พร้อมปลายงอ
             for(let i = 0; i < data.countX; i++) {
                 const offsetZ = -innerHalfL + (i * stepX);
                 const p1 = new THREE.Vector3(-innerHalfW, 0.13, offsetZ);
@@ -643,7 +636,7 @@
                 rebarGroup.add(createCylinderBetweenPoints(p2, p4, rebarRadius, rebarMaterial));
             }
 
-            // ตะแกรงแกน Z พร้อมปลายงอ $90^\circ$
+            // ตะแกรงแกน Z พร้อมปลายงอ
             for(let i = 0; i < data.countY; i++) {
                 const offsetX = -innerHalfW + (i * stepY);
                 const p1 = new THREE.Vector3(offsetX, 0.15, -innerHalfL);
@@ -656,13 +649,16 @@
                 rebarGroup.add(createCylinderBetweenPoints(p2, p4, rebarRadius, rebarMaterial));
             }
 
-            // เหล็กรัดรอบ $1\text{-}\varnothing9$ มม. (Cylinder Mesh)
+            // เหล็กรัดรอบ 1-Ø9 มม. พร้อมงอปลายล็อกมุม (Lap/Hook Splice 3D)
             const tieY = 0.14;
+            const tieOverlap = 0.15;
             const t1 = new THREE.Vector3(-innerHalfW, tieY, -innerHalfL);
             const t2 = new THREE.Vector3(innerHalfW, tieY, -innerHalfL);
             const t3 = new THREE.Vector3(innerHalfW, tieY, innerHalfL);
             const t4 = new THREE.Vector3(-innerHalfW, tieY, innerHalfL);
-            
+            const tOverlapPoint = new THREE.Vector3(-innerHalfW + tieOverlap, tieY, -innerHalfL);
+
+            rebarGroup.add(createCylinderBetweenPoints(t1, tOverlapPoint, tieRadius, rebarMaterial));
             rebarGroup.add(createCylinderBetweenPoints(t1, t2, tieRadius, rebarMaterial));
             rebarGroup.add(createCylinderBetweenPoints(t2, t3, tieRadius, rebarMaterial));
             rebarGroup.add(createCylinderBetweenPoints(t3, t4, tieRadius, rebarMaterial));
@@ -670,10 +666,10 @@
 
             group.add(rebarGroup);
 
-            // --- ข้อ 1: โครงเหล็กเสาตอม่อทรงกระบอก 3D (ขางอฉาก + เหล็กปลอก) ---
+            // โครงเหล็กเสาตอม่อ 3D
             const colRebarGroup = new THREE.Group();
             const colRebarRadius = (data.colDb / 2000) * 2.2;
-            const stirrupRadius = (6 / 2000) * 2.2; // เหล็กปลอก RB6
+            const stirrupRadius = (6 / 2000) * 2.2;
             const colHalf = 0.06;
             const colBottomY = 0.16;
             const colTopY = 0.10 + 1.50 + 0.48;
@@ -695,7 +691,6 @@
                 colRebarGroup.add(createCylinderBetweenPoints(b1, b3, colRebarRadius, colRebarMaterial));
             });
 
-            // เหล็กปลอกเสาตอม่อ @ 0.15 ม.
             for(let y = 0.10 + th + 0.15; y <= colTopY - 0.1; y += 0.15) {
                 const s1 = new THREE.Vector3(-colHalf, y, -colHalf);
                 const s2 = new THREE.Vector3(colHalf, y, -colHalf);
@@ -719,7 +714,6 @@
             grandTotalWeight += parseFloat(specs.weight);
             grandTotalVolume += parseFloat(specs.volume);
 
-            // ป้ายชื่อ 3D CSS2D
             const labelDiv = document.createElement('div');
             labelDiv.className = 'grid-label-3d';
             labelDiv.innerHTML = `<b>Grid ${pos.id}</b><br><span style="font-size:9px; color:#e6c584;">${data.name} (${data.col})</span>`;
