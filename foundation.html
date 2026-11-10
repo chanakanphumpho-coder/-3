@@ -318,7 +318,7 @@
             <!-- 3D Canvas Box -->
             <div class="canvas-container">
                 <div class="canvas-overlay-tip">
-                    <i class="fa-solid fa-check-circle"></i> แสดงผลข้อมูลถอดแบบและโมเดล 3D ครบถ้วนอัตโนมัติ
+                    <i class="fa-solid fa-check-circle"></i> แสดงโมเดลเหล็กรัดรอบพร้อมงอปลายล็อกมุมและถอดแบบอัตโนมัติ
                 </div>
                 <div id="webgl-canvas"></div>
                 <div class="canvas-toolbar">
@@ -405,6 +405,7 @@
             const totalFootingRebarLen = (data.countX * lenX) + (data.countY * lenY);
             const footingRebarWeight = totalFootingRebarLen * unitWeight[db];
 
+            // คำนวณเหล็กรัดรอบรอบฐานรากพร้อมระยะทาบงอปลาย
             const tiePerimeter = 2 * ((w - 0.10) + (l - 0.10)) + 0.30;
             const tieWeight = tiePerimeter * unitWeight[9];
 
@@ -648,16 +649,16 @@
                 rebarGroup.add(createCylinderBetweenPoints(p2, p4, rebarRadius, rebarMaterial));
             }
 
-            // เหล็กรัดรอบ 1-Ø9 มม. พร้อมงอปลายล็อกมุม (Lap/Hook Splice 3D)
+            // --- เหล็กรัดรอบ 1-Ø9 มม. พร้อมงอปลายล็อกมุม (Lap/Hook Splice 3D) ---
             const tieY = 0.14;
-            const tieOverlap = 0.15;
+            const tieOverlap = 0.15; // ระยะทาบงอปลาย 15 ซม.
             const t1 = new THREE.Vector3(-innerHalfW, tieY, -innerHalfL);
             const t2 = new THREE.Vector3(innerHalfW, tieY, -innerHalfL);
             const t3 = new THREE.Vector3(innerHalfW, tieY, innerHalfL);
             const t4 = new THREE.Vector3(-innerHalfW, tieY, innerHalfL);
             const tOverlapPoint = new THREE.Vector3(-innerHalfW + tieOverlap, tieY, -innerHalfL);
 
-            rebarGroup.add(createCylinderBetweenPoints(t1, tOverlapPoint, tieRadius, rebarMaterial));
+            rebarGroup.add(createCylinderBetweenPoints(t1, tOverlapPoint, tieRadius, rebarMaterial)); // ปลายงอทาบ
             rebarGroup.add(createCylinderBetweenPoints(t1, t2, tieRadius, rebarMaterial));
             rebarGroup.add(createCylinderBetweenPoints(t2, t3, tieRadius, rebarMaterial));
             rebarGroup.add(createCylinderBetweenPoints(t3, t4, tieRadius, rebarMaterial));
