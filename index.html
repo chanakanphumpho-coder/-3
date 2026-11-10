@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน | Executive Suite</title>
+    <title>ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน | Luxury Suite</title>
     <!-- Google Fonts: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome สำหรับไอคอน -->
@@ -11,16 +11,15 @@
     
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            --accent-blue: #0284c7;
-            --accent-gold: #d97706;
-            --bg-canvas: #f1f5f9;
+            --primary-gold: #c5a059;       /* สีทองหรูหรา */
+            --primary-gold-light: #e6c584; /* สีทองอ่อน */
+            --bg-canvas: #f8fafc;          /* เทาคลีนๆ สว่าง */
             --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-light: rgba(226, 232, 240, 0.8);
-            --shadow-subtle: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
-            --shadow-hover: 0 20px 30px -10px rgba(2, 132, 199, 0.15);
+            --text-main: #1e293b;          /* เทาเข้มเกือบดำ อ่านง่าย */
+            --text-muted: #64748b;         /* เทากลาง */
+            --border-light: #e2e8f0;
+            --shadow-subtle: 0 10px 25px -5px rgba(30, 41, 59, 0.05), 0 8px 10px -6px rgba(30, 41, 59, 0.05);
+            --shadow-hover: 0 20px 30px -10px rgba(197, 160, 89, 0.2);
         }
 
         * {
@@ -38,25 +37,38 @@
             min-height: 100vh;
         }
 
-        /* Luxury Header */
+        /* Luxury Waved Header (โทนขาว เทา ทอง พร้อมคลื่นพริ้วไหว) */
         header {
-            background: var(--primary-gradient);
-            color: white;
-            padding: 3rem 2rem 4rem 2rem;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--text-main);
+            padding: 3.5rem 2rem 5rem 2rem;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border-bottom: 2px solid #e2e8f0;
         }
 
-        /* ตกแต่งพื้นหลัง Header ด้วยรูปทรงเรขาคณิตจางๆ ให้ดูไฮเทค */
+        /* SVG Wave Background Effect */
+        .wave-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,50 L1200,120 L0,120 Z" fill="%23f8fafc" opacity="1"></path></svg>') no-repeat;
+            background-size: cover;
+            pointer-events: none;
+        }
+
+        /* ตกแต่งแสงเงาทองเรืองแสงจางๆ */
         header::after {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+            top: -20%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(197, 160, 89, 0.12) 0%, transparent 70%);
             border-radius: 50%;
             pointer-events: none;
         }
@@ -81,44 +93,46 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            color: #0f172a;
         }
 
         .header-title-group h1 i {
-            color: #38bdf8;
+            color: var(--primary-gold);
             font-size: 1.8rem;
         }
 
         .header-title-group p {
             font-size: 1.05rem;
-            color: #94a3b8;
+            color: var(--text-muted);
             font-weight: 300;
         }
 
         .project-badge {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid var(--primary-gold-light);
             padding: 0.75rem 1.25rem;
             border-radius: 50px;
             font-size: 0.9rem;
-            color: #e2e8f0;
+            color: #92400e;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(197, 160, 89, 0.1);
         }
 
         .project-badge span {
             width: 8px;
             height: 8px;
-            background-color: #34d399;
+            background-color: var(--primary-gold);
             border-radius: 50%;
-            box-shadow: 0 0 8px #34d399;
+            box-shadow: 0 0 8px var(--primary-gold);
         }
 
         /* Main Content Container */
         .container {
             max-width: 1280px;
-            margin: -2rem auto 3rem auto; /* ดึงขึ้นมาทับ Header เล็กน้อยให้ดูมีมิติ Floating */
+            margin: -1.5rem auto 3rem auto;
             padding: 0 2rem;
             flex: 1;
             width: 100%;
@@ -146,7 +160,7 @@
             content: '';
             width: 4px;
             height: 20px;
-            background-color: var(--accent-blue);
+            background-color: var(--primary-gold);
             border-radius: 2px;
         }
 
@@ -173,7 +187,7 @@
             overflow: hidden;
         }
 
-        /* เส้นขอบเรืองแสงด้านบนเมื่อเอาเมาส์ชี้ */
+        /* แถบเส้นขอบสีทองเรืองแสงเมื่อเอาเมาส์ชี้ */
         .menu-card::before {
             content: '';
             position: absolute;
@@ -181,7 +195,7 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, var(--accent-blue), #38bdf8);
+            background: linear-gradient(90deg, var(--primary-gold), var(--primary-gold-light));
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -189,7 +203,7 @@
         .menu-card:hover {
             transform: translateY(-8px);
             box-shadow: var(--shadow-hover);
-            border-color: rgba(2, 132, 199, 0.3);
+            border-color: rgba(197, 160, 89, 0.4);
         }
 
         .menu-card:hover::before {
@@ -207,13 +221,13 @@
             width: 60px;
             height: 60px;
             border-radius: 14px;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            color: var(--accent-blue);
+            background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+            color: #b45309;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.6rem;
-            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8);
             transition: transform 0.3s ease;
         }
 
@@ -224,7 +238,7 @@
         .card-number {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #cbd5e1;
+            color: #e2e8f0;
         }
 
         .menu-card h3 {
@@ -248,7 +262,7 @@
             justify-content: space-between;
             font-size: 0.95rem;
             font-weight: 600;
-            color: var(--accent-blue);
+            color: #b45309;
             padding-top: 1rem;
             border-top: 1px solid #f1f5f9;
         }
@@ -263,8 +277,8 @@
 
         /* Footer */
         footer {
-            background-color: #0f172a;
-            color: #64748b;
+            background-color: #1e293b;
+            color: #94a3b8;
             text-align: center;
             padding: 1.5rem;
             font-size: 0.85rem;
@@ -275,7 +289,7 @@
         /* Responsive */
         @media (max-width: 768px) {
             header {
-                padding: 2rem 1.5rem 3rem 1.5rem;
+                padding: 2.5rem 1.5rem 4rem 1.5rem;
             }
             .header-title-group h1 {
                 font-size: 1.6rem;
@@ -289,7 +303,7 @@
 </head>
 <body>
 
-    <!-- Luxury Header -->
+    <!-- Luxury Waved Header -->
     <header>
         <div class="header-container">
             <div class="header-title-group">
@@ -300,6 +314,8 @@
                 <span></span> ระบบพร้อมใช้งาน (Ready)
             </div>
         </div>
+        <!-- คลื่นตกแต่งด้านล่างหัวเว็บ -->
+        <div class="wave-bg"></div>
     </header>
 
     <!-- Main Content -->
@@ -339,7 +355,7 @@
                     <p>ถอดแบบโครงสร้างเสา, คาน, และพื้นคอนกรีตเสริมเหล็ก ครอบคลุมทั้งชั้น 1 และชั้น 2 พร้อมคานอะเส</p>
                 </div>
                 <div class="card-footer">
-                    <span>เปิดโมดูล</span> <i class="fa-solid fa-arrow-right-long"></i>
+                    <span>เปิดโมdูล</span> <i class="fa-solid fa-arrow-right-long"></i>
                 </div>
             </a>
 
