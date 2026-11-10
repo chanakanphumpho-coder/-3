@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน</title>
+    <title>ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน | Executive Suite</title>
     <!-- Google Fonts: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome สำหรับไอคอน -->
@@ -11,14 +11,16 @@
     
     <style>
         :root {
-            --primary-color: #0284c7;    /* ฟ้าวิศวกรรม */
-            --primary-dark: #0369a1;
-            --accent-color: #38bdf8;
-            --bg-color: #f8fafc;         /* เทาคลีนๆ */
+            --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            --accent-blue: #0284c7;
+            --accent-gold: #d97706;
+            --bg-canvas: #f1f5f9;
             --card-bg: #ffffff;
-            --text-main: #1e293b;
+            --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-color: #e2e8f0;
+            --border-light: rgba(226, 232, 240, 0.8);
+            --shadow-subtle: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+            --shadow-hover: 0 20px 30px -10px rgba(2, 132, 199, 0.15);
         }
 
         * {
@@ -29,219 +31,357 @@
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-canvas);
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        /* Header Bar */
+        /* Luxury Header */
         header {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            background: var(--primary-gradient);
             color: white;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 3rem 2rem 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
-        header h1 {
-            font-size: 1.8rem;
+        /* ตกแต่งพื้นหลัง Header ด้วยรูปทรงเรขาคณิตจางๆ ให้ดูไฮเทค */
+        header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .header-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-title-group h1 {
+            font-size: 2.2rem;
             font-weight: 600;
+            letter-spacing: -0.5px;
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
-        header p {
-            font-size: 1rem;
-            opacity: 0.9;
+        .header-title-group h1 i {
+            color: #38bdf8;
+            font-size: 1.8rem;
+        }
+
+        .header-title-group p {
+            font-size: 1.05rem;
+            color: #94a3b8;
             font-weight: 300;
+        }
+
+        .project-badge {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 0.75rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .project-badge span {
+            width: 8px;
+            height: 8px;
+            background-color: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #34d399;
         }
 
         /* Main Content Container */
         .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
+            max-width: 1280px;
+            margin: -2rem auto 3rem auto; /* ดึงขึ้นมาทับ Header เล็กน้อยให้ดูมีมิติ Floating */
+            padding: 0 2rem;
             flex: 1;
             width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
 
         .section-title {
-            font-size: 1.25rem;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
             color: var(--text-main);
-            border-left: 4px solid var(--primary-color);
-            padding-left: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        /* Grid Menu Cards */
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background-color: var(--accent-blue);
+            border-radius: 2px;
+        }
+
+        /* Grid Menu Cards - Luxury Style */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2.5rem;
+            gap: 1.75rem;
         }
 
         .menu-card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.75rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid var(--border-light);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             text-decoration: none;
             color: inherit;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* เส้นขอบเรืองแสงด้านบนเมื่อเอาเมาส์ชี้ */
+        .menu-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), #38bdf8);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .menu-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(2, 132, 199, 0.15);
-            border-color: var(--accent-color);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(2, 132, 199, 0.3);
+        }
+
+        .menu-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
         }
 
         .card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            background-color: #e0f2fe;
-            color: var(--primary-color);
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: var(--accent-blue);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.6rem;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.6);
+            transition: transform 0.3s ease;
+        }
+
+        .menu-card:hover .card-icon {
+            transform: scale(1.08) rotate(3deg);
+        }
+
+        .card-number {
             font-size: 1.5rem;
-            margin-bottom: 1.25rem;
+            font-weight: 700;
+            color: #cbd5e1;
         }
 
         .menu-card h3 {
-            font-size: 1.15rem;
+            font-size: 1.25rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             color: var(--text-main);
+            letter-spacing: -0.3px;
         }
 
         .menu-card p {
-            font-size: 0.9rem;
+            font-size: 0.925rem;
             color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
         }
 
         .card-footer {
             display: flex;
             align-items: center;
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--primary-color);
+            justify-content: space-between;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            padding-top: 1rem;
+            border-top: 1px solid #f1f5f9;
         }
 
         .card-footer i {
-            margin-left: 0.5rem;
-            transition: transform 0.2s;
+            transition: transform 0.3s ease;
         }
 
         .menu-card:hover .card-footer i {
-            transform: translateX(4px);
+            transform: translateX(6px);
         }
 
         /* Footer */
         footer {
-            background-color: #1e293b;
-            color: #94a3b8;
+            background-color: #0f172a;
+            color: #64748b;
             text-align: center;
-            padding: 1rem;
+            padding: 1.5rem;
             font-size: 0.85rem;
             margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.5rem;
+            header {
+                padding: 2rem 1.5rem 3rem 1.5rem;
             }
-            .menu-grid {
-                grid-template-columns: 1fr;
+            .header-title-group h1 {
+                font-size: 1.6rem;
+            }
+            .container {
+                margin-top: -1rem;
+                padding: 0 1rem;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header ส่วนหัวของระบบ -->
+    <!-- Luxury Header -->
     <header>
-        <h1><i class="fa-solid fa-helmet-safety"></i> ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน</h1>
-        <p>ระบบคำนวณปริมาณงานก่อสร้างและประเมินราคากลางโครงสร้างอาคารอัจฉริยะ</p>
+        <div class="header-container">
+            <div class="header-title-group">
+                <h1><i class="fa-solid fa-compass-drafting"></i> ระบบถอดแบบโครงสร้างบ้าน</h1>
+                <p>Advanced Structural Estimation & Quantity Surveying Suite</p>
+            </div>
+            <div class="project-badge">
+                <span></span> ระบบพร้อมใช้งาน (Ready)
+            </div>
+        </div>
     </header>
 
-    <!-- เนื้อหาหลัก -->
+    <!-- Main Content -->
     <div class="container">
-        <div class="section-title">เลือกหมวดหมู่การคำนวณและถอดแบบ</div>
+        <div class="section-header">
+            <div class="section-title">หมวดหมู่โมดูลการคำนวณหลัก</div>
+        </div>
 
         <div class="menu-grid">
             <!-- เมนูที่ 1: ฐานราก -->
             <a href="foundation.html" class="menu-card">
                 <div>
-                    <div class="card-icon">
-                        <i class="fa-solid fa-layer-group"></i>
+                    <div class="card-top">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-cubes"></i>
+                        </div>
+                        <span class="card-number">01</span>
                     </div>
-                    <h3>หมวดงานฐานรากและโครงสร้างใต้ดิน</h3>
-                    <p>คำนวณคอนกรีตหยาบ, ฐานราก (Footing), ตอม่อ, คานคอดิน และเสาเข็ม</p>
+                    <h3>หมวดงานฐานราก</h3>
+                    <p>คำนวณปริมาณคอนกรีตหยาบ, ฐานราก (Footing), ตอม่อ, คานคอดิน และเสาเข็มตอก/เจาะ</p>
                 </div>
                 <div class="card-footer">
-                    <span>เข้าสู่หมวดหมู่</span> <i class="fa-solid fa-arrow-right"></i>
+                    <span>เปิดโมดูล</span> <i class="fa-solid fa-arrow-right-long"></i>
                 </div>
             </a>
 
             <!-- เมนูที่ 2: โครงสร้างส่วนบน -->
             <a href="structure.html" class="menu-card">
                 <div>
-                    <div class="card-icon">
-                        <i class="fa-solid fa-building"></i>
+                    <div class="card-top">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <span class="card-number">02</span>
                     </div>
-                    <h3>หมวดงานโครงสร้างส่วนบน</h3>
-                    <p>คำนวณปริมาณเสา ชั้น 1-2, คาน ชั้น 1-2, พื้น ชั้น 1-2 และคานอะเส</p>
+                    <h3>หมวดโครงสร้างส่วนบน</h3>
+                    <p>ถอดแบบโครงสร้างเสา, คาน, และพื้นคอนกรีตเสริมเหล็ก ครอบคลุมทั้งชั้น 1 และชั้น 2 พร้อมคานอะเส</p>
                 </div>
                 <div class="card-footer">
-                    <span>เข้าสู่หมวดหมู่</span> <i class="fa-solid fa-arrow-right"></i>
+                    <span>เปิดโมดูล</span> <i class="fa-solid fa-arrow-right-long"></i>
                 </div>
             </a>
 
             <!-- เมนูที่ 3: โครงสร้างหลังคา -->
             <a href="roof.html" class="menu-card">
                 <div>
-                    <div class="card-icon">
-                        <i class="fa-solid fa-house-chimney"></i>
+                    <div class="card-top">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-house-chimney-window"></i>
+                        </div>
+                        <span class="card-number">03</span>
                     </div>
-                    <h3>หมวดโครงสร้างหลังคาและเหล็ก</h3>
-                    <p>คำนวณจันทัน, อะเส, อกไก่, แป และโครงสร้างเหล็กหลังคารวม</p>
+                    <h3>หมวดโครงสร้างหลังคา</h3>
+                    <p>คำนวณโครงสร้างเหล็กหลังคา, จันทัน, อะเส, อกไก่, แป และน้ำหนักเหล็กรูปพรรณตามหลักวิศวกรรม</p>
                 </div>
                 <div class="card-footer">
-                    <span>เข้าสู่หมวดหมู่</span> <i class="fa-solid fa-arrow-right"></i>
+                    <span>เปิดโมดูล</span> <i class="fa-solid fa-arrow-right-long"></i>
                 </div>
             </a>
 
             <!-- เมนูที่ 4: สรุปราคากลาง -->
             <a href="estimate.html" class="menu-card">
                 <div>
-                    <div class="card-icon">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <div class="card-top">
+                        <div class="card-icon">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <span class="card-number">04</span>
                     </div>
-                    <h3>ระบบคำนวณราคากลาง (ปร.1 / ปร.1ก)</h3>
-                    <p>รวบรวมปริมาณวัสดุและคำนวณต้นทุน ค่าวัสดุ ค่าแรง ออกมาเป็นฟอร์มราคากลาง</p>
+                    <h3>ระบบราคากลาง (ปร.1 / ปร.1ก)</h3>
+                    <p>ประมวลผลต้นทุนวัสดุก่อสร้าง ค่าแรง และจัดทำฟอร์มสรุปราคากลางมาตรฐานเพื่อการยื่นประเมิน</p>
                 </div>
                 <div class="card-footer">
-                    <span>เข้าสู่หมวดหมู่</span> <i class="fa-solid fa-arrow-right"></i>
+                    <span>เปิดโมดูล</span> <i class="fa-solid fa-arrow-right-long"></i>
                 </div>
             </a>
         </div>
     </div>
 
-    <!-- Footer ล่างสุด -->
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2026 ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน | วิศวกรรมสถานและการก่อสร้าง</p>
+        <p>&copy; 2026 Structural Estimation System &bull; Professional Engineering Suite. All Rights Reserved.</p>
     </footer>
 
 </body>
