@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Interactive Foundation & Detailed QTO | Luxury Suite</title>
+    <!-- Google Fonts: Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js สำหรับเรนเดอร์ 3 มิติ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <style>
+        :root {
+            --primary-gold: #c5a059;       
+            --primary-gold-light: #e6c584; 
+            --bg-canvas: #f8fafc;          
+            --card-bg: #ffffff;
+            --text-main: #1e293b;          
+            --text-muted: #64748b;         
+            --border-light: #e2e8f0;
+            --shadow-subtle: 0 10px 25px -5px rgba(30, 41, 59, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--text-main);
+            padding: 2rem 2rem 4rem 2rem;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .header-title-group h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #0f172a;
+        }
+
+        .header-title-group h1 i {
+            color: var(--primary-gold);
+        }
+
+        .btn-back {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1px solid var(--border-light);
+            padding: 0.5rem 1.25rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            border-color: var(--primary-gold);
+            color: #b45309;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: -1.5rem auto 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .viewer-layout {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .viewer-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 3D Canvas Box */
+        .canvas-container {
+            background: #0f172a;
+            border-radius: 16px;
+            height: 680px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid rgba(197, 160, 89, 0.2);
+        }
+
+        #webgl-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .canvas-overlay-tip {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            color: #e2e8f0;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .canvas-overlay-tip i {
+            color: var(--primary-gold);
+            margin-right: 0.4rem;
+        }
+
+        /* Info Panel Side */
+        .info-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            max-height: 680px;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 0.75rem;
+        }
+
+        .panel-header h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-header h3 i {
+            color: var(--primary-gold);
+        }
+
+        .info-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .info-card h4 {
+            font-size: 1rem;
+            color: #b45309;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-grid {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 0.35rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-main);
+            text-align: right;
+        }
+
+        .tech-spec-box {
+            background: #f1f5f9;
+            border-left: 3px solid var(--primary-gold);
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #334155;
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        footer {
+            background-color: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 1.25rem;
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="header-title-group">
+                <h1><i class="fa-solid fa-cube"></i> แปลงฐานราก 3 มิติ & ถอดแบบวิศวกรรมละเอียด (Detail QTO)</h1>
+            </div>
+            <a href="index.html" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="viewer-layout">
+            
+            <!-- ส่วนแสดงผล 3D Canvas -->
+            <div class="canvas-container">
+                <div class="canvas-overlay-tip">
+                    <i class="fa-solid fa-computer-mouse"></i> คลิกที่ฐานรากเพื่อตรวจสอบระยะงอเหล็กและรายละเอียดวิศวกรรม
+                </div>
+                <div id="webgl-canvas"></div>
+            </div>
+
+            <!-- ส่วนแสดงข้อมูลรายละเอียด (Info Panel) -->
+            <div class="info-panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-calculator"></i> ถอดแบบวัสดุ & ระยะงอเหล็ก</h3>
+                </div>
+
+                <div class="info-card" id="selected-info">
+                    <h4><span>รายละเอียดจุดสำรวจ</span> <span class="badge-grid" id="grid-tag">Grid --</span></h4>
+                    <div class="info-row"><span class="info-label">ประเภทฐานราก:</span><span class="info-value" id="val-type">-</span></div>
+                    <div class="info-row"><span class="info-label">ขนาดฐานราก (กxยxหนา):</span><span class="info-value" id="val-size">-</span></div>
+                    <div class="info-row"><span class="info-label">คอนกรีตหุ้ม (Covering):</span><span class="info-value" id="val-cover">5.0 ซม. (สัมผัสดิน)</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กตะแกรงฐานราก:</span><span class="info-value" id="val-rebar">-</span></div>
+                    <div class="info-row"><span class="info-label">ระยะงอฉากปลายเหล็ก ($90^\circ$ Hook):</span><span class="info-value" id="val-hook">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กรัดรอบ $1\varnothing9$ มม.:</span><span class="info-value" id="val-tie">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กหลักเสาตอม่อ + ระยะทาบ ($40d_b$):</span><span class="info-value" id="val-col-rebar">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กปลอกเสา + ระยะงอ $135^\circ$:</span><span class="info-value" id="val-stirrup">-</span></div>
+                    <div class="info-row"><span class="info-label">คำนวณน้ำหนักเหล็กรวมจุดนี้ (เผื่อ 7%):</span><span class="info-value" id="val-weight" style="color:#b45309; font-size:0.95rem;">- kg</span></div>
+
+                    <div class="tech-spec-box">
+                        <i class="fa-solid fa-microchip"></i> <b>เกณฑ์คำนวณ:</b> คำนวณระยะงอปลายเหล็ก $12d_b$, ระยะทาบเสา $40d_b$, งอปลอก $135^\circ$ ($6d_b$) และคิดเผื่อสูญเสียตัดงอ $7\%$ ตามราคากลางกรมบัญชีกลาง
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h4>สรุปภาพรวมฐานรากทั้งหมด 14 ต้น</h4>
+                    <div class="info-row"><span class="info-label">ปริมาณคอนกรีตโครงสร้างรวม:</span><span class="info-value">5.82 ม.³</span></div>
+                    <div class="info-row"><span class="info-label">ปริมาณคอนกรีตหยาบ Lean (1:3:5):</span><span class="info-value">2.18 ม.³</span></div>
+                    <div class="info-row"><span class="info-label">ปริมาณทรายหยาบอัดแน่น:</span><span class="info-value">2.18 ม.³</span></div>
+                    <div class="info-row"><span class="info-label">น้ำหนักเหล็กเสริมรวมทุกประเภทรวมงอ:</span><span class="info-value" style="color:#b45309;">486.5 kg</span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Structural Estimation System &bull; Precise Engineering QTO. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // ข้อมูลการถอดแบบละเอียดทุกจุดตามแบบแปลน
+        const detailedFoundationData = {
+            "A1": { name: "F0.60x0.60", size: "0.60 x 0.60 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "2.70 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "18.4" },
+            "A2": { name: "F0.60x0.60", size: "0.60 x 0.60 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "2.70 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "18.4" },
+            
+            "B1": { name: "F1.30x1.30", size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
+            "B2": { name: "F1.30x1.30", size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
+            "B3": { name: "F0.90x0.90", size: "0.90 x 0.90 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "3.90 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "24.6" },
+
+            "C1": { name: "F1.30x1.30", size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
+            "C2": { name: "F1.50x1.50", size: "1.50 x 1.50 x 0.30 ม.", rebar: "5 + 5 DB12", hook: "14.4 ซม. (12db)", tie: "6.30 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "46.8" },
+            "C3": { name: "F1.30x1.30", size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
+
+            "D1": { name: "F1.30x1.30", size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
+            "D2": { name: "F1.40x1.40", size: "1.40 x 1.40 x 0.25 ม.", rebar: "6 + 6 DB16", hook: "19.2 ซม. (12db)", tie: "5.90 ม. (รวมทาบ)", colRebar: "4 DB16 (รวมทาบ 64 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "58.5" },
+            "D3": { name: "F1.30x1.30", size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
+
+            "E1": { name: "F0.90x0.90", size: "0.90 x 0.90 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "3.90 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "24.6" },
+            "E2": { name: "F1.00x1.00", size: "1.00 x 1.00 x 0.20 ม.", rebar: "5 + 5 DB12", hook: "14.4 ซม. (12db)", tie: "4.30 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "29.6" },
+            "E3": { name: "F0.90x0.90", size: "0.90 x 0.90 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "3.90 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "24.6" }
+        };
+
+        // ตั้งค่า Three.js Scene
+        const container = document.getElementById('webgl-canvas');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0f172a);
+
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 12, 14);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.8);
+        dirLight.position.set(10, 20, 15);
+        scene.add(dirLight);
+
+        // ตำแหน่งพิกัด Grid ตามแบบแปลน
+        const gridPositions = [
+            { id: "A1", x: -3.5, z: 5.35, sizeVal: 0.6 },
+            { id: "A2", x: 0.0,  z: 5.35, sizeVal: 0.6 },
+            { id: "B1", x: -3.5, z: 3.85, sizeVal: 1.3 },
+            { id: "B2", x: 0.0,  z: 3.85, sizeVal: 1.3 },
+            { id: "B3", x: 3.0,  z: 3.85, sizeVal: 0.9 },
+            { id: "C1", x: -3.5, z: -0.15, sizeVal: 1.3 },
+            { id: "C2", x: 0.0,  z: -0.15, sizeVal: 1.5 },
+            { id: "C3", x: 3.0,  z: -0.15, sizeVal: 1.3 },
+            { id: "D1", x: -3.5, z: -2.35, sizeVal: 1.3 },
+            { id: "D2", x: 0.0,  z: -2.35, sizeVal: 1.4 },
+            { id: "D3", x: 3.0,  z: -2.35, sizeVal: 1.3 },
+            { id: "E1", x: -3.5, z: -5.35, sizeVal: 0.9 },
+            { id: "E2", x: 0.0,  z: -5.35, sizeVal: 1.0 },
+            { id: "E3", x: 3.0,  z: -5.35, sizeVal: 0.9 }
+        ];
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const interactiveObjects = [];
+
+        const concreteMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.7 });
+        const goldMat = new THREE.MeshStandardMaterial({ color: 0xc5a059, metalness: 0.4, roughness: 0.3 });
+
+        gridPositions.forEach(pos => {
+            const group = new THREE.Group();
+            group.userData = { id: pos.id };
+
+            const fGeo = new THREE.BoxGeometry(pos.sizeVal, 0.3, pos.sizeVal);
+            const fMesh = new THREE.Mesh(fGeo, concreteMat);
+            fMesh.position.y = 0.15;
+            group.add(fMesh);
+
+            const cGeo = new THREE.BoxGeometry(0.2, 1.5, 0.2);
+            const cMesh = new THREE.Mesh(cGeo, goldMat);
+            cMesh.position.y = 1.05;
+            group.add(cMesh);
+
+            group.position.set(pos.x, 0, pos.z);
+            scene.add(group);
+            interactiveObjects.push(fMesh);
+        });
+
+        window.addEventListener('click', (event) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / renderer.domElement.clientWidth) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / renderer.domElement.clientHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(interactiveObjects);
+
+            if (intersects.length > 0) {
+                const gridId = intersects[0].object.parent.userData.id;
+                updatePanel(gridId);
+            }
+        });
+
+        function updatePanel(id) {
+            const data = detailedFoundationData[id];
+            document.getElementById('grid-tag').innerText = `Grid ${id}`;
+            document.getElementById('val-type').innerText = data.name;
+            document.getElementById('val-size').innerText = data.size;
+            document.getElementById('val-rebar').innerText = data.rebar;
+            document.getElementById('val-hook').innerText = data.hook;
+            document.getElementById('val-tie').innerText = data.tie;
+            document.getElementById('val-col-rebar').innerText = data.colRebar;
+            document.getElementById('val-stirrup').innerText = data.stirrup;
+            document.getElementById('val-weight').innerText = `${data.weight} kg`;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
+</body>
+</html>
