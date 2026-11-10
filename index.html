@@ -37,27 +37,30 @@
             min-height: 100vh;
         }
 
-        /* Luxury Waved Header (โทนขาว เทา ทอง พร้อมคลื่นพริ้วไหว) */
+        /* Luxury Waved Header */
         header {
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             color: var(--text-main);
-            padding: 3.5rem 2rem 5rem 2rem;
+            padding: 3.5rem 2rem 5.5rem 2rem;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            border-bottom: 2px solid #e2e8f0;
         }
 
-        /* SVG Wave Background Effect */
+        /* SVG Wave Background Effect พร้อมขอบเส้นสีทองแทรก */
         .wave-bg {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 80px;
-            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,50 L1200,120 L0,120 Z" fill="%23f8fafc" opacity="1"></path></svg>') no-repeat;
-            background-size: cover;
+            height: 90px;
             pointer-events: none;
+        }
+
+        .wave-bg svg {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         /* ตกแต่งแสงเงาทองเรืองแสงจางๆ */
@@ -314,8 +317,18 @@
                 <span></span> ระบบพร้อมใช้งาน (Ready)
             </div>
         </div>
-        <!-- คลื่นตกแต่งด้านล่างหัวเว็บ -->
-        <div class="wave-bg"></div>
+        
+        <!-- คลื่นตกแต่งพร้อมเส้นขอบสีทองแทรกตรงขอบคลื่น -->
+        <div class="wave-bg">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <!-- เส้นคลื่นทองเงาจางๆ ด้านหลัง -->
+                <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,50 L1200,120 L0,120 Z" fill="none" stroke="#e6c584" stroke-width="6" opacity="0.4"></path>
+                <!-- เส้นขอบคลื่นสีทองหลัก -->
+                <path d="M0,5 C150,95 350,-35 500,45 C650,125 900,15 1200,55 L1200,120 L0,120 Z" fill="none" stroke="#c5a059" stroke-width="3"></path>
+                <!-- พื้นหลังคลื่นสีขาวเติมด้านล่าง -->
+                <path d="M0,8 C150,98 350,-32 500,48 C650,128 900,18 1200,58 L1200,120 L0,120 Z" fill="#f8fafc"></path>
+            </svg>
+        </div>
     </header>
 
     <!-- Main Content -->
@@ -325,7 +338,7 @@
         </div>
 
         <div class="menu-grid">
-            <!-- เมนูที่ 1: ฐานราก (อัปเดตชื่อลิงก์และเนื้อหาตามที่คุณขอ) -->
+            <!-- เมนูที่ 1: งานโครงสร้างใต้ดิน -->
             <a href="foundation.html" class="menu-card">
                 <div>
                     <div class="card-top">
