@@ -292,7 +292,7 @@
     <header>
         <div class="header-container">
             <div class="header-title-group">
-                <h1><i class="fa-solid fa-layer-group"></i> แปลงฐานราก 3 มิติ (BIM QTO & Rebar Engine)</h1>
+                <h1><i class="fa-solid fa-layer-group"></i> แปลงฐานราก 3 มิติ (BIM Hover QTO & Rebar Engine)</h1>
             </div>
             <a href="index.html" class="btn-back">
                 <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
@@ -306,7 +306,7 @@
             <!-- 3D Canvas Box -->
             <div class="canvas-container">
                 <div class="canvas-overlay-tip">
-                    <i class="fa-solid fa-computer-mouse"></i> คลิกเลือกฐานรากต้นใดก็ได้เพื่อถอดแบบปริมาณคอนกรีตและเหล็กเสริมทันที
+                    <i class="fa-solid fa-hand-pointer"></i> วางเมาส์สัมผัสฐานรากเพื่อถอดแบบและดูโมเดลเหล็กรัดรอบงอปลาย
                 </div>
                 <div id="webgl-canvas"></div>
                 <div class="canvas-toolbar">
@@ -322,7 +322,7 @@
                 </div>
 
                 <div class="info-card" id="selected-info">
-                    <h4><span id="card-title">กรุณาคลิกเลือกฐานรากใน 3D</span> <span class="badge-grid" id="grid-tag">Grid --</span></h4>
+                    <h4><span id="card-title">กรุณาวางเมาส์สัมผัสฐานรากใน 3D</span> <span class="badge-grid" id="grid-tag">Grid --</span></h4>
                     <div class="info-row"><span class="info-label">ประเภทฐานราก / เสา:</span><span class="info-value" id="val-type">-</span></div>
                     <div class="info-row"><span class="info-label">ขนาดฐานราก (กxยxหนา):</span><span class="info-value" id="val-size">-</span></div>
                     <div class="info-row"><span class="info-label">ความลึกฐานราก (ถึงท้องฐาน):</span><span class="info-value" id="val-depth">1.50 ม. (ใต้ระดับดินเดิม)</span></div>
@@ -335,7 +335,7 @@
                     <div class="info-row"><span class="info-label">น้ำหนักเหล็กรวมจุดนี้ (เผื่อ 7%):</span><span class="info-value" id="val-weight" style="color:#b45309; font-size:0.95rem;">- kg</span></div>
 
                     <div class="tech-spec-box">
-                        <i class="fa-solid fa-shield-halved"></i> <b>ระบบถอดแบบอัตโนมัติ (QTO):</b> คำนวณปริมาตรคอนกรีตและเหล็กเสริมรายจุดแบบ Real-time พร้อมแสดงโมเดลเหล็กรัดรอบและลูกปูนรอง 5 ซม. ครบถ้วน
+                        <i class="fa-solid fa-shield-halved"></i> <b>Interactive Hover QTO:</b> แสดงโมเดลเหล็กรัดรอบพร้อมระยะงอปลายล็อกมุม 3 มิติ และคำนวณปริมาณงานอัตโนมัติทันทีเมื่อวางเมาส์สัมผัส
                     </div>
                 </div>
 
@@ -578,7 +578,7 @@
 
             // 1. คอนกรีตหุ้มฐานราก
             const fGeo = new THREE.BoxGeometry(w, th, l);
-            const footingMesh = new THREE.Mesh(fGeo, concreteBodyMat);
+            const footingMesh = new THREE.Mesh(fGeo, concreteBodyMat.clone());
             footingMesh.position.y = 0.10 + (th / 2);
             footingMesh.castShadow = true;
             footingMesh.receiveShadow = true;
@@ -649,16 +649,16 @@
                 rebarGroup.add(createCylinderBetweenPoints(p2, p4, rebarRadius, rebarMaterial));
             }
 
-            // --- เหล็กรัดรอบ 1-Ø9 มม. พร้อมงอปลายล็อกมุม (Lap/Hook Splice 3D) ---
+            // --- เหล็กรัดรอบ 1-Ø9 มม. พร้อมงอปลายทาบล็อกมุม (Lap/Hook Splice 3D) ---
             const tieY = 0.14;
-            const tieOverlap = 0.15;
+            const tieOverlap = 0.15; // ระยะทาบงอปลาย 15 ซม.
             const t1 = new THREE.Vector3(-innerHalfW, tieY, -innerHalfL);
             const t2 = new THREE.Vector3(innerHalfW, tieY, -innerHalfL);
             const t3 = new THREE.Vector3(innerHalfW, tieY, innerHalfL);
             const t4 = new THREE.Vector3(-innerHalfW, tieY, innerHalfL);
             const tOverlapPoint = new THREE.Vector3(-innerHalfW + tieOverlap, tieY, -innerHalfL);
 
-            rebarGroup.add(createCylinderBetweenPoints(t1, tOverlapPoint, tieRadius, rebarMaterial));
+            rebarGroup.add(createCylinderBetweenPoints(t1, tOverlapPoint, tieRadius, rebarMaterial)); // ปลายงอทาบ
             rebarGroup.add(createCylinderBetweenPoints(t1, t2, tieRadius, rebarMaterial));
             rebarGroup.add(createCylinderBetweenPoints(t2, t3, tieRadius, rebarMaterial));
             rebarGroup.add(createCylinderBetweenPoints(t3, t4, tieRadius, rebarMaterial));
@@ -745,8 +745,10 @@
             });
         }
 
-        // --- ระบบคลิกตรวจจับวัตถุแบบแม่นยำสูง (Smart Raycasting) ---
-        window.addEventListener('click', (event) => {
+        // --- ระบบ Hover (แค่วางเมาส์สัมผัสก็ถอดแบบและไฮไลต์เปลี่ยนสีทันที) ---
+        let hoveredMesh = null;
+
+        window.addEventListener('mousemove', (event) => {
             if(event.target.closest('.canvas-toolbar') || event.target.closest('.info-panel')) return;
 
             const rect = renderer.domElement.getBoundingClientRect();
@@ -754,21 +756,30 @@
             mouse.y = -((event.clientY - rect.top) / renderer.domElement.clientHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(scene.children, true);
+            const intersects = raycaster.intersectObjects(interactiveObjects);
 
             if (intersects.length > 0) {
-                let targetObject = intersects[0].object;
-                
-                // ค้นหาย้อนกลับไปหา Group แม่ของ Grid นั้นๆ อัตโนมัติ
-                while (targetObject && !targetObject.userData.id && targetObject.parent) {
-                    targetObject = targetObject.parent;
-                }
+                const hitMesh = intersects[0].object;
+                const gridId = hitMesh.parent.userData.id;
 
-                if (targetObject && targetObject.userData && targetObject.userData.id) {
-                    const gridId = targetObject.userData.id;
-                    if (detailedFoundationData[gridId]) {
-                        updatePanel(gridId);
+                if (detailedFoundationData[gridId]) {
+                    updatePanel(gridId);
+
+                    if (hoveredMesh !== hitMesh) {
+                        if (hoveredMesh) {
+                            hoveredMesh.material.color.setHex(0xcbd5e1);
+                            hoveredMesh.material.opacity = 0.22;
+                        }
+                        hoveredMesh = hitMesh;
+                        hoveredMesh.material.color.setHex(0xc5a059); // สีทองเมื่อเมาส์สัมผัส
+                        hoveredMesh.material.opacity = 0.55;
                     }
+                }
+            } else {
+                if (hoveredMesh) {
+                    hoveredMesh.material.color.setHex(0xcbd5e1);
+                    hoveredMesh.material.opacity = 0.22;
+                    hoveredMesh = null;
                 }
             }
         });
