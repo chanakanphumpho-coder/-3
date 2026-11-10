@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Rebar Wireframe & Detail QTO | Luxury Suite</title>
+    <title>3D Foundation & Grid Lines | Luxury Suite</title>
     <!-- Google Fonts: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome สำหรับไอคอน -->
@@ -252,7 +252,7 @@
     <header>
         <div class="header-container">
             <div class="header-title-group">
-                <h1><i class="fa-solid fa-network-wired"></i> แปลงฐานราก 3 มิติ (3D Rebar Wireframe Cage)</h1>
+                <h1><i class="fa-solid fa-cube"></i> แปลงฐานราก 3 มิติ (Concrete Body + Rebar + Grid Lines)</h1>
             </div>
             <a href="index.html" class="btn-back">
                 <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
@@ -266,7 +266,7 @@
             <!-- ส่วนแสดงผล 3D Canvas -->
             <div class="canvas-container">
                 <div class="canvas-overlay-tip">
-                    <i class="fa-solid fa-computer-mouse"></i> คลิกที่โครงเหล็กฐานรากแต่ละจุดเพื่อดูสเปกเหล็กเสริมและระยะงอ
+                    <i class="fa-solid fa-computer-mouse"></i> แสดงเนื้อคอนกรีตหุ้ม + โครงเหล็กภายใน + เส้นกริดไลน์อ้างอิง
                 </div>
                 <div id="webgl-canvas"></div>
             </div>
@@ -274,7 +274,7 @@
             <!-- ส่วนแสดงข้อมูลรายละเอียด (Info Panel) -->
             <div class="info-panel">
                 <div class="panel-header">
-                    <h3><i class="fa-solid fa-calculator"></i> รายละเอียดเหล็กเสริม (Rebar Detail)</h3>
+                    <h3><i class="fa-solid fa-calculator"></i> รายละเอียดทางวิศวกรรม</h3>
                 </div>
 
                 <div class="info-card" id="selected-info">
@@ -290,7 +290,7 @@
                     <div class="info-row"><span class="info-label">น้ำหนักเหล็กรวมจุดนี้ (เผื่อ 7%):</span><span class="info-value" id="val-weight" style="color:#b45309; font-size:0.95rem;">- kg</span></div>
 
                     <div class="tech-spec-box">
-                        <i class="fa-solid fa-shield-halved"></i> <b>มาตรฐานวิศวกรรม:</b> แสดงโครงสร้างเหล็กเส้นถัก (Wireframe Rebar Cage) พร้อมคำนวณระยะงอขอและระยะทาบตามหลักวิศวกรรมโครงสร้าง
+                        <i class="fa-solid fa-shield-halved"></i> <b>มาตรฐานวิศวกรรม:</b> แสดงเนื้อคอนกรีตหุ้มโปร่งแสง (Transparent Concrete Body) เผยให้เห็นโครงเหล็กถักภายในและเส้นกริดไลน์ตามแบบแปลน
                     </div>
                 </div>
 
@@ -305,7 +305,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 Structural Estimation System &bull; 3D Rebar Cage Engine. All Rights Reserved.</p>
+        <p>&copy; 2026 Structural Estimation System &bull; 3D Concrete & Rebar Engine. All Rights Reserved.</p>
     </footer>
 
     <script>
@@ -347,8 +347,30 @@
         controls.enableDamping = true;
 
         scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(10, 20, 10);
+        scene.add(dirLight);
 
-        // ตำแหน่งพิกัด Grid ตามแบบแปลนจริง
+        // --- สร้างเส้นกริดไลน์ (Grid Lines A-E และ 1-3 ตามแบบแปลน) ---
+        const gridMaterial = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.6 });
+        
+        // แกน Z (A, B, C, D, E)
+        const zCoords = [5.35, 3.85, -0.15, -2.35, -5.35];
+        zCoords.forEach(z => {
+            const points = [new THREE.Vector3(-4.5, 0, z), new THREE.Vector3(4.0, 0, z)];
+            const geom = new THREE.BufferGeometry().setFromPoints(points);
+            scene.add(new THREE.Line(geom, gridMaterial));
+        });
+
+        // แกน X (1, 2, 3)
+        const xCoords = [-3.5, 0.0, 3.0];
+        xCoords.forEach(x => {
+            const points = [new THREE.Vector3(x, 0, 6.2), new THREE.Vector3(x, 0, -6.2)];
+            const geom = new THREE.BufferGeometry().setFromPoints(points);
+            scene.add(new THREE.Line(geom, gridMaterial));
+        });
+
+        // ตำแหน่งพิกัดฐานราก
         const gridPositions = [
             { id: "A1", x: -3.5, z: 5.35, sizeVal: 0.6 },
             { id: "A2", x: 0.0,  z: 5.35, sizeVal: 0.6 },
@@ -370,9 +392,17 @@
         const mouse = new THREE.Vector2();
         const interactiveObjects = [];
 
-        // วัสดุโครงเหล็กสีทอง/ส้มเรืองแสง (Rebar Wireframe Style)
+        // วัสดุคอนกรีตหุ้ม (โปร่งแสง สีเทาอ่อน Luxury) และโครงเหล็กสีทอง
+        const concreteBodyMat = new THREE.MeshPhysicalMaterial({
+            color: 0x94a3b8,
+            transparent: true,
+            opacity: 0.3,
+            roughness: 0.5,
+            metalness: 0.1,
+            transmission: 0.2
+        });
         const rebarLineMat = new THREE.LineBasicMaterial({ color: 0xf59e0b, linewidth: 2 });
-        const colRebarMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 }); // สีฟ้าสำหรับเหล็กเสา
+        const colRebarMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 });
 
         gridPositions.forEach(pos => {
             const group = new THREE.Group();
@@ -381,39 +411,37 @@
             const s = pos.sizeVal;
             const halfS = s / 2;
 
-            // --- 1. สร้างตะแกรงเหล็กฐานราก (Rebar Cage Grid Lines) ---
+            // --- 1. คอนกรีตหุ้มฐานราก (Footing Concrete Body) ---
+            const fGeo = new THREE.BoxGeometry(s, 0.3, s);
+            const footingMesh = new THREE.Mesh(fGeo, concreteBodyMat);
+            footingMesh.position.y = 0.15;
+            group.add(footingMesh);
+
+            // --- 2. คอนกรีตหุ้มเสาตอม่อ (Stub Column Concrete Body) ---
+            const cBodyGeo = new THREE.BoxGeometry(0.2, 1.5, 0.2);
+            const colMesh = new THREE.Mesh(cBodyGeo, concreteBodyMat);
+            colMesh.position.y = 1.05;
+            group.add(colMesh);
+
+            // --- 3. โครงเหล็กตะแกรงภายในฐานราก ---
             const rebarPoints = [];
-            // เส้นตารางเหล็กฐานรากแกน X & Z
             for(let i = -halfS + 0.05; i <= halfS - 0.05; i += 0.2) {
-                // ขนานแกน X (พร้อมงอปลายขึ้นรูป U เล็กน้อย)
                 rebarPoints.push(new THREE.Vector3(-halfS+0.05, 0.05, i), new THREE.Vector3(halfS-0.05, 0.05, i));
-                // ขนานแกน Z
                 rebarPoints.push(new THREE.Vector3(i, 0.08, -halfS+0.05), new THREE.Vector3(i, 0.08, halfS-0.05));
             }
-            // เหล็กรัดรอบฐานราก
-            rebarPoints.push(
-                new THREE.Vector3(-halfS+0.03, 0.06, -halfS+0.03), new THREE.Vector3(halfS-0.03, 0.06, -halfS+0.03),
-                new THREE.Vector3(halfS-0.03, 0.06, -halfS+0.03), new THREE.Vector3(halfS-0.03, 0.06, halfS-0.03),
-                new THREE.Vector3(halfS-0.03, 0.06, halfS-0.03), new THREE.Vector3(-halfS+0.03, 0.06, halfS-0.03),
-                new THREE.Vector3(-halfS+0.03, 0.06, halfS-0.03), new THREE.Vector3(-halfS+0.03, 0.06, -halfS+0.03)
-            );
-
             const rebarGeo = new THREE.BufferGeometry().setFromPoints(rebarPoints);
             const rebarCage = new THREE.LineSegments(rebarGeo, rebarLineMat);
             group.add(rebarCage);
 
-            // --- 2. สร้างโครงเหล็กเสาตอม่อ (Column Main Bars & Stirrups) ---
+            // --- 4. โครงเหล็กแกนเสา + เหล็กปลอกภายใน ---
             const colPoints = [];
-            const colHalf = 0.08;
-            const colH = 1.5;
-            // เหล็กแกนหลัก 4 เส้น
+            const colHalf = 0.06;
             [-colHalf, colHalf].forEach(cx => {
                 [-colHalf, colHalf].forEach(cz => {
-                    colPoints.push(new THREE.Vector3(cx, 0.0, cz), new THREE.Vector3(cx, colH, cz));
+                    colPoints.push(new THREE.Vector3(cx, 0.0, cz), new THREE.Vector3(cx, 1.5, cz));
                 });
             });
-            // เหล็กปลอกรัดเสา (Stirrups) เรียงตามความสูง
-            for(let y = 0.2; y <= colH; y += 0.2) {
+            for(let y = 0.2; y <= 1.5; y += 0.2) {
                 colPoints.push(
                     new THREE.Vector3(-colHalf, y, -colHalf), new THREE.Vector3(colHalf, y, -colHalf),
                     new THREE.Vector3(colHalf, y, -colHalf), new THREE.Vector3(colHalf, y, colHalf),
@@ -421,21 +449,13 @@
                     new THREE.Vector3(-colHalf, y, colHalf), new THREE.Vector3(-colHalf, y, -colHalf)
                 );
             }
-
             const colGeo = new THREE.BufferGeometry().setFromPoints(colPoints);
             const colCage = new THREE.LineSegments(colGeo, colRebarMat);
             group.add(colCage);
 
-            // สร้างกล่องใสรอบฐานรากสำหรับรับคลิกเมาส์เลือกจุด
-            const hitBoxGeo = new THREE.BoxGeometry(s, 0.3, s);
-            const hitBoxMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
-            const hitMesh = new THREE.Mesh(hitBoxGeo, hitBoxMat);
-            hitMesh.position.y = 0.15;
-            group.add(hitMesh);
-
             group.position.set(pos.x, 0, pos.z);
             scene.add(group);
-            interactiveObjects.push(hitMesh);
+            interactiveObjects.push(footingMesh);
         });
 
         // ระบบคลิกตรวจเช็กข้อมูล
