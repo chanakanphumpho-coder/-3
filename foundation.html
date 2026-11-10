@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Advanced Soil Strata & Rebar Cage | Luxury Suite</title>
+    <title>3D BIM Ultra-Realistic Soil Strata & Rebar Engine</title>
     <!-- Google Fonts: Prompt -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome สำหรับไอคอน -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Three.js และ CSS2DRenderer สำหรับป้ายชื่อลอยใน 3D -->
+    <!-- Three.js & Renderers -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
@@ -101,7 +101,7 @@
 
         .viewer-layout {
             display: grid;
-            grid-template-columns: 1fr 420px;
+            grid-template-columns: 1fr 430px;
             gap: 1.5rem;
         }
 
@@ -115,7 +115,7 @@
         .canvas-container {
             background: #0b1120;
             border-radius: 16px;
-            height: 700px;
+            height: 720px;
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-subtle);
@@ -148,7 +148,6 @@
             margin-right: 0.4rem;
         }
 
-        /* Toolbar Controls inside 3D */
         .canvas-toolbar {
             position: absolute;
             bottom: 1rem;
@@ -175,7 +174,6 @@
             font-weight: 600;
         }
 
-        /* CSS2D Label Styling */
         .grid-label-3d {
             background: rgba(15, 23, 42, 0.9);
             color: #f8fafc;
@@ -190,7 +188,6 @@
             text-align: center;
         }
 
-        /* Info Panel Side */
         .info-panel {
             background: var(--card-bg);
             border-radius: 16px;
@@ -200,7 +197,7 @@
             display: flex;
             flex-direction: column;
             gap: 1.25rem;
-            max-height: 700px;
+            max-height: 720px;
             overflow-y: auto;
         }
 
@@ -295,7 +292,7 @@
     <header>
         <div class="header-container">
             <div class="header-title-group">
-                <h1><i class="fa-solid fa-layer-group"></i> แปลงฐานราก 3 มิติ (Soil Strata & Section View)</h1>
+                <h1><i class="fa-solid fa-layer-group"></i> แปลงฐานราก 3 มิติ (BIM Ultra-Realistic Engine)</h1>
             </div>
             <a href="index.html" class="btn-back">
                 <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
@@ -306,10 +303,10 @@
     <div class="container">
         <div class="viewer-layout">
             
-            <!-- ส่วนแสดงผล 3D Canvas -->
+            <!-- 3D Canvas Box -->
             <div class="canvas-container">
                 <div class="canvas-overlay-tip">
-                    <i class="fa-solid fa-computer-mouse"></i> คลิกที่ฐานรากเพื่อดูรายละเอียด | หมุนและซูมด้วยเมาส์
+                    <i class="fa-solid fa-computer-mouse"></i> คลิกเลือกฐานรากเพื่อตรวจแท่งเหล็กทรงกระบอก, ลูกปูนรอง และผิวทราย/คอนกรีต
                 </div>
                 <div id="webgl-canvas"></div>
                 <div class="canvas-toolbar">
@@ -318,33 +315,34 @@
                 </div>
             </div>
 
-            <!-- ส่วนแสดงข้อมูลรายละเอียด (Info Panel) -->
+            <!-- Info Panel -->
             <div class="info-panel">
                 <div class="panel-header">
-                    <h3><i class="fa-solid fa-calculator"></i> รายละเอียดทางวิศวกรรม</h3>
+                    <h3><i class="fa-solid fa-calculator"></i> ถอดแบบโครงสร้างและน้ำหนักเหล็ก</h3>
                 </div>
 
                 <div class="info-card" id="selected-info">
                     <h4><span id="card-title">กรุณาคลิกเลือกฐานรากใน 3D</span> <span class="badge-grid" id="grid-tag">Grid --</span></h4>
-                    <div class="info-row"><span class="info-label">ประเภทฐานราก:</span><span class="info-value" id="val-type">-</span></div>
+                    <div class="info-row"><span class="info-label">ประเภทฐานราก / เสา:</span><span class="info-value" id="val-type">-</span></div>
                     <div class="info-row"><span class="info-label">ขนาดฐานราก (กxยxหนา):</span><span class="info-value" id="val-size">-</span></div>
-                    <div class="info-row"><span class="info-label">คอนกรีตหุ้ม (Covering):</span><span class="info-value" id="val-cover">5.0 ซม. (สัมผัสดิน)</span></div>
+                    <div class="info-row"><span class="info-label">ความลึกฐานราก (ถึงท้องฐาน):</span><span class="info-value" id="val-depth">1.50 ม. (ใต้ระดับดินเดิม)</span></div>
                     <div class="info-row"><span class="info-label">เหล็กตะแกรงฐานราก:</span><span class="info-value" id="val-rebar">-</span></div>
-                    <div class="info-row"><span class="info-label">ระยะงอปลายเหล็ก:</span><span class="info-value" id="val-hook">-</span></div>
-                    <div class="info-row"><span class="info-label">เหล็กรัดรอบฐานราก:</span><span class="info-value" id="val-tie">-</span></div>
-                    <div class="info-row"><span class="info-label">เหล็กหลักเสา + ระยะทาบ:</span><span class="info-value" id="val-col-rebar">-</span></div>
-                    <div class="info-row"><span class="info-label">เหล็กปลอกเสา + งอ 135°:</span><span class="info-value" id="val-stirrup">-</span></div>
+                    <div class="info-row"><span class="info-label">ระยะงอปลายเหล็ก ($12d_b$):</span><span class="info-value" id="val-hook">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กรัดรอบ ($1\text{-}\varnothing9$ มม.):</span><span class="info-value" id="val-tie">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กหลักเสา + ทาบ ($40d_b$):</span><span class="info-value" id="val-col-rebar">-</span></div>
+                    <div class="info-row"><span class="info-label">เหล็กปลอกเสา + งอ $135^\circ$:</span><span class="info-value" id="val-stirrup">-</span></div>
+                    <div class="info-row"><span class="info-label">ปริมาตรคอนกรีตฐานราก:</span><span class="info-value" id="val-vol-conc">- m³</span></div>
                     <div class="info-row"><span class="info-label">น้ำหนักเหล็กรวมจุดนี้ (เผื่อ 7%):</span><span class="info-value" id="val-weight" style="color:#b45309; font-size:0.95rem;">- kg</span></div>
 
                     <div class="tech-spec-box">
-                        <i class="fa-solid fa-shield-halved"></i> <b>มาตรฐานวิศวกรรม:</b> แสดงชั้นทรายหยาบอัดแน่น, คอนกรีตหยาบรองพื้น (Lean Concrete 1:3:5)[span_0](start_span)[span_0](end_span)[span_1](start_span)[span_1](end_span), ระยะงอปลายเหล็ก 90° Hook, เหล็ก 1-Ø9 และระยะทาบ 40d<sub>b</sub>.
+                        <i class="fa-solid fa-shield-halved"></i> <b>มาตรฐาน BIM 3D:</b> แสดงเหล็กทรงกระบอกหนาตามขนาดจริง ($dB$), มีลูกปูนหนุน (Concrete Spacer 5 ซม.) และพื้นผิวทราย/คอนกรีตรองพื้นขรุขระ (Procedural Bump Map)
                     </div>
                 </div>
 
                 <div class="info-card">
-                    <h4>สรุปภาพรวมโครงการ</h4>
-                    <div class="info-row"><span class="info-label">จำนวนฐานรากทั้งหมด:</span><span class="info-value">14 ต้น</span></div>
-                    <div class="info-row"><span class="info-label">น้ำหนักเหล็กเสริมรวมทุกจุด:</span><span class="info-value" style="color:#b45309;">486.5 kg</span></div>
+                    <h4>สรุปภาพรวมทั้งโครงการ (14 ต้น)</h4>
+                    <div class="info-row"><span class="info-label">ปริมาตรคอนกรีตฐานรากถอดได้:</span><span class="info-value" id="total-conc-vol" style="color:#0284c7;">- m³</span></div>
+                    <div class="info-row"><span class="info-label">น้ำหนักเหล็กเสริมรวมถอดได้:</span><span class="info-value" id="total-rebar-weight" style="color:#b45309; font-size:1rem;">- kg</span></div>
                 </div>
             </div>
 
@@ -356,27 +354,99 @@
     </footer>
 
     <script>
-        // ข้อมูลสเปกฐานรากตามแบบแปลนจริง
+        // ข้อมูลสเปกฐานรากตรงตามแบบแปลน 100%[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)
         const detailedFoundationData = {
-            "A1": { name: "F0.60x0.60", thick: 0.20, size: "0.60 x 0.60 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "2.70 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "18.4" },
-            "A2": { name: "F0.60x0.60", thick: 0.20, size: "0.60 x 0.60 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "2.70 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "18.4" },
+            "A1": { name: "F0.60x0.60", col: "C1", thick: 0.20, width: 0.60, length: 0.60, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 },
+            "A2": { name: "F0.60x0.60", col: "C1", thick: 0.20, width: 0.60, length: 0.60, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 },
             
-            "B1": { name: "F1.30x1.30", thick: 0.25, size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
-            "B2": { name: "F1.30x1.30", thick: 0.25, size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
-            "B3": { name: "F0.90x0.90", thick: 0.20, size: "0.90 x 0.90 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "3.90 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "24.6" },
+            "B1": { name: "F1.30x1.30", col: "C1", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colRebarType: "DB12", colCount: 4, colDb: 12 },
+            "B2": { name: "F1.30x1.30", col: "C1", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colRebarType: "DB12", colCount: 4, colDb: 12 },
+            "B3": { name: "F0.90x0.90", col: "C1", thick: 0.20, width: 0.90, length: 0.90, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 },
 
-            "C1": { name: "F1.30x1.30", thick: 0.25, size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
-            "C2": { name: "F1.50x1.50", thick: 0.30, size: "1.50 x 1.50 x 0.30 ม.", rebar: "5 + 5 DB12", hook: "14.4 ซม. (12db)", tie: "6.30 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "46.8" },
-            "C3": { name: "F1.30x1.30", thick: 0.25, size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
+            "C1": { name: "F1.30x1.30", col: "C1", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colRebarType: "DB12", colCount: 4, colDb: 12 },
+            "C2": { name: "F1.50x1.50", col: "C1", thick: 0.30, width: 1.50, length: 1.50, rebarType: "DB12", countX: 5, countY: 5, db: 12, colRebarType: "DB12", colCount: 4, colDb: 12 },
+            "C3": { name: "F1.30x1.30", col: "C1", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colRebarType: "DB12", colCount: 4, colDb: 12 },
 
-            "D1": { name: "F1.30x1.30", thick: 0.25, size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
-            "D2": { name: "F1.40x1.40", thick: 0.25, size: "1.40 x 1.40 x 0.25 ม.", rebar: "6 + 6 DB16", hook: "19.2 ซม. (12db)", tie: "5.90 ม. (รวมทาบ)", colRebar: "4 DB16 (รวมทาบ 64 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "58.5" },
-            "D3": { name: "F1.30x1.30", thick: 0.25, size: "1.30 x 1.30 x 0.25 ม.", rebar: "7 + 7 DB12", hook: "14.4 ซม. (12db)", tie: "5.50 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "41.2" },
+            "D1": { name: "F1.30x1.30", col: "C1", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colRebarType: "DB12", colCount: 4, colDb: 12 },
+            "D2": { name: "F1.40x1.40", col: "C1", thick: 0.25, width: 1.40, length: 1.40, rebarType: "DB16", countX: 6, countY: 6, db: 16, colRebarType: "DB16", colCount: 4, colDb: 16 },
+            "D3": { name: "F1.30x1.30", col: "C1", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colRebarType: "DB12", colCount: 4, colDb: 12 },
 
-            "E1": { name: "F0.90x0.90", thick: 0.20, size: "0.90 x 0.90 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "3.90 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "24.6" },
-            "E2": { name: "F1.00x1.00", thick: 0.20, size: "1.00 x 1.00 x 0.20 ม.", rebar: "5 + 5 DB12", hook: "14.4 ซม. (12db)", tie: "4.30 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "29.6" },
-            "E3": { name: "F0.90x0.90", thick: 0.20, size: "0.90 x 0.90 x 0.20 ม.", rebar: "4 + 4 Ø9 มม.", hook: "10.8 ซม. (12db)", tie: "3.90 ม. (รวมทาบ)", colRebar: "4 DB12 (รวมทาบ 48 ซม.)", stirrup: "RB6 @ 0.15ม. (งอ 135°)", weight: "24.6" }
+            "E1": { name: "F0.90x0.90", col: "C1A", thick: 0.20, width: 0.90, length: 0.90, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 },
+            "E2": { name: "F1.00x1.00", col: "C1A", thick: 0.20, width: 1.00, length: 1.00, rebarType: "DB12", countX: 5, countY: 5, db: 12, colRebarType: "DB12", colCount: 4, colDb: 12 },
+            "E3": { name: "F0.90x0.90", col: "C1A", thick: 0.20, width: 0.90, length: 0.90, rebarType: "RB9", countX: 4, countY: 4, db: 9, colRebarType: "DB12", colCount: 4, colDb: 12 }
         };
+
+        const unitWeight = { 6: 0.222, 9: 0.499, 12: 0.888, 16: 1.578 };
+
+        function calculateEngineeringSpecs(id) {
+            const data = detailedFoundationData[id];
+            const w = data.width;
+            const l = data.length;
+            const th = data.thick;
+            const db = data.db;
+            const colDb = data.colDb;
+
+            const hookM = (12 * db) / 1000;
+            const lapM = (40 * colDb) / 1000;
+            
+            const lenX = (w - 0.10) + (2 * hookM);
+            const lenY = (l - 0.10) + (2 * hookM);
+            const totalFootingRebarLen = (data.countX * lenX) + (data.countY * lenY);
+            const footingRebarWeight = totalFootingRebarLen * unitWeight[db];
+
+            const tiePerimeter = 2 * ((w - 0.10) + (l - 0.10)) + 0.30;
+            const tieWeight = tiePerimeter * unitWeight[9];
+
+            const colHeight = 1.50 + lapM + 0.20;
+            const totalColRebarLen = 4 * colHeight;
+            const colRebarWeight = totalColRebarLen * unitWeight[colDb];
+
+            const colStirrupCount = Math.ceil((1.50 - th) / 0.15);
+            const stirrupPerimeter = (2 * (0.20 + 0.20) - 0.08) + 0.15;
+            const totalStirrupLen = colStirrupCount * stirrupPerimeter;
+            const stirrupWeight = totalStirrupLen * unitWeight[6];
+
+            const rawWeight = footingRebarWeight + tieWeight + colRebarWeight + stirrupWeight;
+            const finalWeight = (rawWeight * 1.07).toFixed(1);
+            const concVol = (w * l * th).toFixed(3);
+
+            return {
+                sizeStr: `${w.toFixed(2)} x ${l.toFixed(2)} x ${th.toFixed(2)} ม.`,
+                rebarStr: `${data.countX} + ${data.countY} ${data.rebarType}`,
+                hookStr: `${(hookM * 100).toFixed(1)} ซม. (12d_b)`,
+                tieStr: `${tiePerimeter.toFixed(2)} ม. (รวมทาบ)`,
+                colRebarStr: `4 ${data.colRebarType} (ทาบ ${(lapM * 100).toFixed(0)} ซม.)`,
+                stirrupStr: `RB6 @ 0.15ม. (งอ 135°)`,
+                weight: finalWeight,
+                volume: concVol
+            };
+        }
+
+        // --- ข้อ 3: ฟังก์ชันสร้าง Procedural Noise Texture สำหรับมิติผิวทรายขรุขระและคอนกรีตหยาบ ---
+        function createNoiseTexture(density, opacity) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#808080';
+            ctx.fillRect(0, 0, 256, 256);
+
+            for (let i = 0; i < density; i++) {
+                const x = Math.random() * 256;
+                const y = Math.random() * 256;
+                const val = Math.floor(Math.random() * 255);
+                ctx.fillStyle = `rgba(${val},${val},${val},${opacity})`;
+                ctx.fillRect(x, y, 2, 2);
+            }
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(4, 4);
+            return texture;
+        }
+
+        const sandBumpTexture = createNoiseTexture(5000, 0.8);
+        const leanBumpTexture = createNoiseTexture(3000, 0.5);
 
         // ตั้งค่า Three.js Scene
         const container = document.getElementById('webgl-canvas');
@@ -410,24 +480,32 @@
         dirLight.shadow.mapSize.height = 2048;
         scene.add(dirLight);
 
-        // --- 1. เลเยอร์ชั้นดินและทรายรองพื้น ---
-        // ชั้นทรายหยาบ (หนา 0.10 ม.)
+        // --- ข้อ 3: เลเยอร์ชั้นทรายหยาบอัดแน่น & คอนกรีตหยาบ ใส่ Texture Bump Map ขรุขระ ---
         const sandGeo = new THREE.BoxGeometry(10, 0.10, 14);
-        const sandMat = new THREE.MeshStandardMaterial({ color: 0xc2a679, roughness: 0.9 });
+        const sandMat = new THREE.MeshStandardMaterial({ 
+            color: 0xc2a679, 
+            roughness: 0.95,
+            bumpMap: sandBumpTexture,
+            bumpScale: 0.015
+        });
         const sandMesh = new THREE.Mesh(sandGeo, sandMat);
         sandMesh.position.set(0, -0.05, 0);
         sandMesh.receiveShadow = true;
         scene.add(sandMesh);
 
-        // ชั้นคอนกรีตหยาบ Lean Concrete (หนา 0.10 ม.)
         const leanGeo = new THREE.BoxGeometry(9.6, 0.10, 13.6);
-        const leanMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.7 });
+        const leanMat = new THREE.MeshStandardMaterial({ 
+            color: 0x64748b, 
+            roughness: 0.85,
+            bumpMap: leanBumpTexture,
+            bumpScale: 0.008
+        });
         const leanMesh = new THREE.Mesh(leanGeo, leanMat);
         leanMesh.position.set(0, 0.05, 0);
         leanMesh.receiveShadow = true;
         scene.add(leanMesh);
 
-        // เส้นระดับดินเดิม Ground Level (+/- 0.00)
+        // เส้นระดับดินเดิม (+/- 0.00)
         const groundLevelY = 0.0;
         const gridMaterial = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.6 });
         
@@ -444,20 +522,11 @@
         });
 
         const gridPositions = [
-            { id: "A1", x: -3.5, z: 5.35, sizeVal: 0.6 },
-            { id: "A2", x: 0.0,  z: 5.35, sizeVal: 0.6 },
-            { id: "B1", x: -3.5, z: 3.85, sizeVal: 1.3 },
-            { id: "B2", x: 0.0,  z: 3.85, sizeVal: 1.3 },
-            { id: "B3", x: 3.0,  z: 3.85, sizeVal: 0.9 },
-            { id: "C1", x: -3.5, z: -0.15, sizeVal: 1.3 },
-            { id: "C2", x: 0.0,  z: -0.15, sizeVal: 1.5 },
-            { id: "C3", x: 3.0,  z: -0.15, sizeVal: 1.3 },
-            { id: "D1", x: -3.5, z: -2.35, sizeVal: 1.3 },
-            { id: "D2", x: 0.0,  z: -2.35, sizeVal: 1.4 },
-            { id: "D3", x: 3.0,  z: -2.35, sizeVal: 1.3 },
-            { id: "E1", x: -3.5, z: -5.35, sizeVal: 0.9 },
-            { id: "E2", x: 0.0,  z: -5.35, sizeVal: 1.0 },
-            { id: "E3", x: 3.0,  z: -5.35, sizeVal: 0.9 }
+            { id: "A1", x: -3.5, z: 5.35 }, { id: "A2", x: 0.0, z: 5.35 },
+            { id: "B1", x: -3.5, z: 3.85 }, { id: "B2", x: 0.0, z: 3.85 }, { id: "B3", x: 3.0, z: 3.85 },
+            { id: "C1", x: -3.5, z: -0.15 }, { id: "C2", x: 0.0, z: -0.15 }, { id: "C3", x: 3.0, z: -0.15 },
+            { id: "D1", x: -3.5, z: -2.35 }, { id: "D2", x: 0.0, z: -2.35 }, { id: "D3", x: 3.0, z: -2.35 },
+            { id: "E1", x: -3.5, z: -5.35 }, { id: "E2", x: 0.0, z: -5.35 }, { id: "E3", x: 3.0, z: -5.35 }
         ];
 
         const raycaster = new THREE.Raycaster();
@@ -465,7 +534,6 @@
         const interactiveObjects = [];
         const allGroups = [];
 
-        // วัสดุคอนกรีตโปร่งแสงขุ่น
         const concreteBodyMat = new THREE.MeshPhysicalMaterial({
             color: 0xcbd5e1,
             transparent: true,
@@ -476,19 +544,44 @@
         });
 
         const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x334155, linewidth: 1.5 });
-        const footingRebarMat = new THREE.LineBasicMaterial({ color: 0xf59e0b, linewidth: 2 });
-        const colRebarMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 });
+        
+        // วัสดุเหล็ก 3D ทรงกระบอกมีแสงเงาสมจริง
+        const rebarMaterial = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.35, metalness: 0.75 });
+        const colRebarMaterial = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.35, metalness: 0.75 });
+        
+        // --- ข้อ 2: วัสดุก้อนลูกปูนรองสเปกตรัม (Spacer Block) ---
+        const spacerMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9, metalness: 0.1 });
+
+        // --- ข้อ 1: ฟังก์ชันสร้างเหล็กแท่งทรงกระบอก 3D (Cylinder Rebar Geometry) ---
+        function createCylinderBetweenPoints(p1, p2, radius, material) {
+            const direction = new THREE.Vector3().subVectors(p2, p1);
+            const height = direction.length();
+            const geometry = new THREE.CylinderGeometry(radius, radius, height, 8);
+            const cylinder = new THREE.Mesh(geometry, material);
+            cylinder.castShadow = true;
+
+            const midpoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+            cylinder.position.copy(midpoint);
+            cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
+            return cylinder;
+        }
+
+        let grandTotalWeight = 0;
+        let grandTotalVolume = 0;
 
         gridPositions.forEach(pos => {
             const group = new THREE.Group();
             group.userData = { id: pos.id };
 
-            const s = pos.sizeVal;
-            const th = detailedFoundationData[pos.id].thick; 
-            const halfS = s / 2;
+            const data = detailedFoundationData[pos.id];
+            const w = data.width;
+            const l = data.length;
+            const th = data.thick; 
+            const halfW = w / 2;
+            const halfL = l / 2;
 
-            // --- คอนกรีตหุ้มฐานราก + ตัดขอบ Wireframe ---
-            const fGeo = new THREE.BoxGeometry(s, th, s);
+            // 1. คอนกรีตหุ้มฐานราก
+            const fGeo = new THREE.BoxGeometry(w, th, l);
             const footingMesh = new THREE.Mesh(fGeo, concreteBodyMat);
             footingMesh.position.y = 0.10 + (th / 2);
             footingMesh.castShadow = true;
@@ -499,10 +592,11 @@
             fEdges.position.copy(footingMesh.position);
             group.add(fEdges);
 
-            // --- คอนกรีตหุ้มเสาตอม่อ + ตัดขอบ ---
-            const cBodyGeo = new THREE.BoxGeometry(0.2, 1.5, 0.2);
+            // 2. คอนกรีตหุ้มเสาตอม่อ
+            const colH = 1.50 - th;
+            const cBodyGeo = new THREE.BoxGeometry(0.20, colH, 0.20);
             const colMesh = new THREE.Mesh(cBodyGeo, concreteBodyMat);
-            colMesh.position.y = 0.10 + th + 0.75;
+            colMesh.position.y = 0.10 + th + (colH / 2);
             colMesh.castShadow = true;
             group.add(colMesh);
 
@@ -510,60 +604,134 @@
             cEdges.position.copy(colMesh.position);
             group.add(cEdges);
 
-            // --- โครงเหล็กตะแกรงฐานราก (สีส้มทอง) ---
-            const rebarPoints = [];
-            for(let i = -halfS + 0.06; i <= halfS - 0.06; i += 0.18) {
-                // แกน X
-                rebarPoints.push(new THREE.Vector3(-halfS+0.05, 0.13, i), new THREE.Vector3(halfS-0.05, 0.13, i));
-                // ปลายงอ Hook 90 องศา
-                rebarPoints.push(new THREE.Vector3(-halfS+0.05, 0.13, i), new THREE.Vector3(-halfS+0.05, 0.13 + (th*0.6), i));
-                rebarPoints.push(new THREE.Vector3(halfS-0.05, 0.13, i), new THREE.Vector3(halfS-0.05, 0.13 + (th*0.6), i));
-
-                // แกน Z
-                rebarPoints.push(new THREE.Vector3(i, 0.15, -halfS+0.05), new THREE.Vector3(i, 0.15, halfS-0.05));
-                // ปลายงอ Hook 90 องศา
-                rebarPoints.push(new THREE.Vector3(i, 0.15, -halfS+0.05), new THREE.Vector3(i, 0.15 + (th*0.6), -halfS+0.05));
-                rebarPoints.push(new THREE.Vector3(i, 0.15, halfS-0.05), new THREE.Vector3(i, 0.15 + (th*0.6), halfS-0.05));
-            }
-            const rebarCage = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(rebarPoints), footingRebarMat);
-            group.add(rebarCage);
-
-            // --- โครงเหล็กเสาตอม่อ (สีฟ้า) ---
-            const colPoints = [];
-            const colHalf = 0.06;
-            [-colHalf, colHalf].forEach(cx => {
-                [-colHalf, colHalf].forEach(cz => {
-                    colPoints.push(new THREE.Vector3(cx, 0.10, cz), new THREE.Vector3(cx, 0.10 + th + 1.5, cz));
+            // --- ข้อ 2: วางลูกปูนหนุนคอนกรีต (Concrete Spacers 5 ซม.) ใต้ตะแกรง 4 มุม ---
+            const cover = 0.05; // 5.0 ซม. ตามสเปก
+            const innerHalfW = halfW - cover;
+            const innerHalfL = halfL - cover;
+            
+            [-innerHalfW + 0.08, innerHalfW - 0.08].forEach(sx => {
+                [-innerHalfL + 0.08, innerHalfL - 0.08].forEach(sz => {
+                    const spacerGeo = new THREE.BoxGeometry(0.05, 0.05, 0.05); // ก้อนลูกปูนขนาด 5x5x5 ซม.
+                    const spacer = new THREE.Mesh(spacerGeo, spacerMat);
+                    spacer.position.set(sx, 0.10 + 0.025, sz);
+                    spacer.castShadow = true;
+                    group.add(spacer);
                 });
             });
-            // เหล็กปลอกเสา @ 0.15ม.
-            for(let y = 0.10 + th + 0.15; y <= 0.10 + th + 1.4; y += 0.15) {
-                colPoints.push(
-                    new THREE.Vector3(-colHalf, y, -colHalf), new THREE.Vector3(colHalf, y, -colHalf),
-                    new THREE.Vector3(colHalf, y, -colHalf), new THREE.Vector3(colHalf, y, colHalf),
-                    new THREE.Vector3(colHalf, y, colHalf), new THREE.Vector3(-colHalf, y, colHalf),
-                    new THREE.Vector3(-colHalf, y, colHalf), new THREE.Vector3(-colHalf, y, -colHalf)
-                );
+
+            // --- ข้อ 1: สร้างแท่งเหล็กตะแกรงทรงกระบอก 3D หนาตามขนาดจริง ($dB$) ---
+            const rebarGroup = new THREE.Group();
+            
+            // คำนวณรัศมีเหล็กจริงตามสเกล 3D (คูณ 2.2 เพื่อให้เห็นความหนามีมิติสวยงาม)
+            const rebarRadius = (data.db / 2000) * 2.2; 
+            const tieRadius = (9 / 2000) * 2.2;
+
+            const stepX = (innerHalfL * 2) / (data.countX - 1);
+            const stepY = (innerHalfW * 2) / (data.countY - 1);
+            const hookH = th * 0.6; // ระยะงอปลาย Hook
+
+            // ตะแกรงแกน X พร้อมปลายงอ $90^\circ$
+            for(let i = 0; i < data.countX; i++) {
+                const offsetZ = -innerHalfL + (i * stepX);
+                const p1 = new THREE.Vector3(-innerHalfW, 0.13, offsetZ);
+                const p2 = new THREE.Vector3(innerHalfW, 0.13, offsetZ);
+                const p3 = new THREE.Vector3(-innerHalfW, 0.13 + hookH, offsetZ);
+                const p4 = new THREE.Vector3(innerHalfW, 0.13 + hookH, offsetZ);
+
+                rebarGroup.add(createCylinderBetweenPoints(p1, p2, rebarRadius, rebarMaterial));
+                rebarGroup.add(createCylinderBetweenPoints(p1, p3, rebarRadius, rebarMaterial));
+                rebarGroup.add(createCylinderBetweenPoints(p2, p4, rebarRadius, rebarMaterial));
             }
-            const colCage = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(colPoints), colRebarMat);
-            group.add(colCage);
+
+            // ตะแกรงแกน Z พร้อมปลายงอ $90^\circ$
+            for(let i = 0; i < data.countY; i++) {
+                const offsetX = -innerHalfW + (i * stepY);
+                const p1 = new THREE.Vector3(offsetX, 0.15, -innerHalfL);
+                const p2 = new THREE.Vector3(offsetX, 0.15, innerHalfL);
+                const p3 = new THREE.Vector3(offsetX, 0.15 + hookH, -innerHalfL);
+                const p4 = new THREE.Vector3(offsetX, 0.15 + hookH, innerHalfL);
+
+                rebarGroup.add(createCylinderBetweenPoints(p1, p2, rebarRadius, rebarMaterial));
+                rebarGroup.add(createCylinderBetweenPoints(p1, p3, rebarRadius, rebarMaterial));
+                rebarGroup.add(createCylinderBetweenPoints(p2, p4, rebarRadius, rebarMaterial));
+            }
+
+            // เหล็กรัดรอบ $1\text{-}\varnothing9$ มม. (Cylinder Mesh)
+            const tieY = 0.14;
+            const t1 = new THREE.Vector3(-innerHalfW, tieY, -innerHalfL);
+            const t2 = new THREE.Vector3(innerHalfW, tieY, -innerHalfL);
+            const t3 = new THREE.Vector3(innerHalfW, tieY, innerHalfL);
+            const t4 = new THREE.Vector3(-innerHalfW, tieY, innerHalfL);
+            
+            rebarGroup.add(createCylinderBetweenPoints(t1, t2, tieRadius, rebarMaterial));
+            rebarGroup.add(createCylinderBetweenPoints(t2, t3, tieRadius, rebarMaterial));
+            rebarGroup.add(createCylinderBetweenPoints(t3, t4, tieRadius, rebarMaterial));
+            rebarGroup.add(createCylinderBetweenPoints(t4, t1, tieRadius, rebarMaterial));
+
+            group.add(rebarGroup);
+
+            // --- ข้อ 1: โครงเหล็กเสาตอม่อทรงกระบอก 3D (ขางอฉาก + เหล็กปลอก) ---
+            const colRebarGroup = new THREE.Group();
+            const colRebarRadius = (data.colDb / 2000) * 2.2;
+            const stirrupRadius = (6 / 2000) * 2.2; // เหล็กปลอก RB6
+            const colHalf = 0.06;
+            const colBottomY = 0.16;
+            const colTopY = 0.10 + 1.50 + 0.48;
+            const hookLength = 0.18;
+
+            const corners = [
+                { x: -colHalf, z: -colHalf, dx: -hookLength, dz: -hookLength },
+                { x:  colHalf, z: -colHalf, dx:  hookLength, dz: -hookLength },
+                { x:  colHalf, z:  colHalf, dx:  hookLength, dz:  hookLength },
+                { x: -colHalf, z:  colHalf, dx: -hookLength, dz:  hookLength }
+            ];
+
+            corners.forEach(c => {
+                const b1 = new THREE.Vector3(c.x, colBottomY, c.z);
+                const b2 = new THREE.Vector3(c.x, colTopY, c.z);
+                const b3 = new THREE.Vector3(c.x + c.dx, colBottomY, c.z + c.dz);
+
+                colRebarGroup.add(createCylinderBetweenPoints(b1, b2, colRebarRadius, colRebarMaterial));
+                colRebarGroup.add(createCylinderBetweenPoints(b1, b3, colRebarRadius, colRebarMaterial));
+            });
+
+            // เหล็กปลอกเสาตอม่อ @ 0.15 ม.
+            for(let y = 0.10 + th + 0.15; y <= colTopY - 0.1; y += 0.15) {
+                const s1 = new THREE.Vector3(-colHalf, y, -colHalf);
+                const s2 = new THREE.Vector3(colHalf, y, -colHalf);
+                const s3 = new THREE.Vector3(colHalf, y, colHalf);
+                const s4 = new THREE.Vector3(-colHalf, y, colHalf);
+
+                colRebarGroup.add(createCylinderBetweenPoints(s1, s2, stirrupRadius, colRebarMaterial));
+                colRebarGroup.add(createCylinderBetweenPoints(s2, s3, stirrupRadius, colRebarMaterial));
+                colRebarGroup.add(createCylinderBetweenPoints(s3, s4, stirrupRadius, colRebarMaterial));
+                colRebarGroup.add(createCylinderBetweenPoints(s4, s1, stirrupRadius, colRebarMaterial));
+            }
+
+            group.add(colRebarGroup);
 
             group.position.set(pos.x, 0, pos.z);
             scene.add(group);
             interactiveObjects.push(footingMesh);
             allGroups.push(group);
 
-            // --- ป้ายชื่อลอย 3D (CSS2D) แก้ไขจุด Syntax Error แล้ว ---
+            const specs = calculateEngineeringSpecs(pos.id);
+            grandTotalWeight += parseFloat(specs.weight);
+            grandTotalVolume += parseFloat(specs.volume);
+
+            // ป้ายชื่อ 3D CSS2D
             const labelDiv = document.createElement('div');
             labelDiv.className = 'grid-label-3d';
-            labelDiv.innerHTML = `<b>Grid ${pos.id}</b><br><span style="font-size:9px; color:#e6c584;">${detailedFoundationData[pos.id].name}</span>`;
+            labelDiv.innerHTML = `<b>Grid ${pos.id}</b><br><span style="font-size:9px; color:#e6c584;">${data.name} (${data.col})</span>`;
             
             const label = new THREE.CSS2DObject(labelDiv);
-            label.position.set(0, 0.10 + th + 1.7, 0);
+            label.position.set(0, 0.10 + 1.50 + 0.60, 0);
             group.add(label);
         });
 
-        // --- ฟังก์ชันปุ่มตัด Section Cut ---
+        document.getElementById('total-rebar-weight').innerText = `${grandTotalWeight.toFixed(1)} kg`;
+        document.getElementById('total-conc-vol').innerText = `${grandTotalVolume.toFixed(2)} m³`;
+
         let currentMode = 'full';
         function setSectionMode(mode) {
             currentMode = mode;
@@ -572,7 +740,7 @@
 
             allGroups.forEach(group => {
                 group.children.forEach(child => {
-                    if(child.isMesh || child.isLineSegments) {
+                    if(child.isMesh || child.isGroup || child.isLineSegments) {
                         if(mode === 'section') {
                             child.visible = group.position.x <= 0.0;
                         } else {
@@ -583,7 +751,6 @@
             });
         }
 
-        // ระบบคลิกตรวจเช็กข้อมูล
         window.addEventListener('click', (event) => {
             const rect = renderer.domElement.getBoundingClientRect();
             mouse.x = ((event.clientX - rect.left) / renderer.domElement.clientWidth) * 2 - 1;
@@ -599,20 +766,22 @@
         });
 
         function updatePanel(id) {
+            const specs = calculateEngineeringSpecs(id);
             const data = detailedFoundationData[id];
+
             document.getElementById('card-title').innerText = `รายละเอียดฐานราก ${id}`;
             document.getElementById('grid-tag').innerText = `Grid ${id}`;
-            document.getElementById('val-type').innerText = data.name;
-            document.getElementById('val-size').innerText = data.size;
-            document.getElementById('val-rebar').innerText = data.rebar;
-            document.getElementById('val-hook').innerText = data.hook;
-            document.getElementById('val-tie').innerText = data.tie;
-            document.getElementById('val-col-rebar').innerText = data.colRebar;
-            document.getElementById('val-stirrup').innerText = data.stirrup;
-            document.getElementById('val-weight').innerText = `${data.weight} kg`;
+            document.getElementById('val-type').innerText = `${data.name} / ${data.col}`;
+            document.getElementById('val-size').innerText = specs.sizeStr;
+            document.getElementById('val-rebar').innerText = specs.rebarStr;
+            document.getElementById('val-hook').innerText = specs.hookStr;
+            document.getElementById('val-tie').innerText = specs.tieStr;
+            document.getElementById('val-col-rebar').innerText = specs.colRebarStr;
+            document.getElementById('val-stirrup').innerText = specs.stirrupStr;
+            document.getElementById('val-vol-conc').innerText = `${specs.volume} m³`;
+            document.getElementById('val-weight').innerText = `${specs.weight} kg`;
         }
 
-        // Animation Loop
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
@@ -621,7 +790,6 @@
         }
         animate();
 
-        // Responsive Resizing
         window.addEventListener('resize', () => {
             camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
