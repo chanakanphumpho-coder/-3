@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน</title>
+    <!-- Google Fonts: Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #0284c7;    /* ฟ้าวิศวกรรม */
+            --primary-dark: #0369a1;
+            --accent-color: #38bdf8;
+            --bg-color: #f8fafc;         /* เทาคลีนๆ */
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Bar */
+        header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Main Content Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            border-left: 4px solid var(--primary-color);
+            padding-left: 0.75rem;
+        }
+
+        /* Grid Menu Cards */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .menu-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(2, 132, 199, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background-color: #e0f2fe;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .menu-card h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .menu-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .card-footer i {
+            margin-left: 0.5rem;
+            transition: transform 0.2s;
+        }
+
+        .menu-card:hover .card-footer i {
+            transform: translateX(4px);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header ส่วนหัวของระบบ -->
+    <header>
+        <h1><i class="fa-solid fa-helmet-safety"></i> ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน</h1>
+        <p>ระบบคำนวณปริมาณงานก่อสร้างและประเมินราคากลางโครงสร้างอาคารอัจฉริยะ</p>
+    </header>
+
+    <!-- เนื้อหาหลัก -->
+    <div class="container">
+        <div class="section-title">เลือกหมวดหมู่การคำนวณและถอดแบบ</div>
+
+        <div class="menu-grid">
+            <!-- เมนูที่ 1: ฐานราก -->
+            <a href="foundation.html" class="menu-card">
+                <div>
+                    <div class="card-icon">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <h3>หมวดงานฐานรากและโครงสร้างใต้ดิน</h3>
+                    <p>คำนวณคอนกรีตหยาบ, ฐานราก (Footing), ตอม่อ, คานคอดิน และเสาเข็ม</p>
+                </div>
+                <div class="card-footer">
+                    <span>เข้าสู่หมวดหมู่</span> <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- เมนูที่ 2: โครงสร้างส่วนบน -->
+            <a href="structure.html" class="menu-card">
+                <div>
+                    <div class="card-icon">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                    <h3>หมวดงานโครงสร้างส่วนบน</h3>
+                    <p>คำนวณปริมาณเสา ชั้น 1-2, คาน ชั้น 1-2, พื้น ชั้น 1-2 และคานอะเส</p>
+                </div>
+                <div class="card-footer">
+                    <span>เข้าสู่หมวดหมู่</span> <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- เมนูที่ 3: โครงสร้างหลังคา -->
+            <a href="roof.html" class="menu-card">
+                <div>
+                    <div class="card-icon">
+                        <i class="fa-solid fa-house-chimney"></i>
+                    </div>
+                    <h3>หมวดโครงสร้างหลังคาและเหล็ก</h3>
+                    <p>คำนวณจันทัน, อะเส, อกไก่, แป และโครงสร้างเหล็กหลังคารวม</p>
+                </div>
+                <div class="card-footer">
+                    <span>เข้าสู่หมวดหมู่</span> <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- เมนูที่ 4: สรุปราคากลาง -->
+            <a href="estimate.html" class="menu-card">
+                <div>
+                    <div class="card-icon">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>ระบบคำนวณราคากลาง (ปร.1 / ปร.1ก)</h3>
+                    <p>รวบรวมปริมาณวัสดุและคำนวณต้นทุน ค่าวัสดุ ค่าแรง ออกมาเป็นฟอร์มราคากลาง</p>
+                </div>
+                <div class="card-footer">
+                    <span>เข้าสู่หมวดหมู่</span> <i class="fa-solid fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer ล่างสุด -->
+    <footer>
+        <p>&copy; 2026 ระบบถอดแบบและคำนวณราคากลางโครงสร้างบ้าน | วิศวกรรมสถานและการก่อสร้าง</p>
+    </footer>
+
+</body>
+</html>
