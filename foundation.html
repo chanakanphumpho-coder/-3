@@ -1,692 +1,1117 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D BIM Structural Foundation & Hook Rebar Details Engine</title>
-    <!-- Google Fonts: Prompt -->
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Three.js & Renderers -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
-    
-    <style>
-        :root {
-            --primary-gold: #c5a059;       
-            --primary-gold-light: #e6c584; 
-            --bg-canvas: #0b1120;          
-            --card-bg: #ffffff;
-            --text-main: #1e293b;          
-            --text-muted: #64748b;         
-            --border-light: #e2e8f0;
-            --shadow-subtle: 0 10px 25px -5px rgba(30, 41, 59, 0.05);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ถอดแบบฐานราก 14 ตำแหน่ง | 3D</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Prompt', sans-serif;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
 
-        body {
-            background-color: #f1f5f9;
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: #ffffff;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-        }
-
-        .header-title-group h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: #f8fafc;
-        }
-
-        .header-title-group h1 i {
-            color: var(--primary-gold);
-        }
-
-        .btn-back {
-            background: rgba(255,255,255,0.1);
-            color: #ffffff;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 0.5rem 1.25rem;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-back:hover {
-            background: var(--primary-gold);
-            color: #0f172a;
-            border-color: var(--primary-gold);
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 1.5rem auto;
-            padding: 0 1.5rem;
-            flex: 1;
-            width: 100%;
-        }
-
-        .viewer-layout {
-            display: grid;
-            grid-template-columns: 1fr 500px;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 1100px) {
-            .viewer-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .canvas-container {
-            background: var(--bg-canvas);
-            border-radius: 16px;
-            height: 780px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid rgba(197, 160, 89, 0.3);
-        }
-
-        #webgl-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .canvas-overlay-tip {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(197, 160, 89, 0.4);
-            color: #e2e8f0;
-            padding: 0.6rem 1rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .canvas-overlay-tip i {
-            color: var(--primary-gold);
-            margin-right: 0.4rem;
-        }
-
-        .canvas-toolbar {
-            position: absolute;
-            bottom: 1rem;
-            left: 1rem;
-            display: flex;
-            gap: 0.5rem;
-            z-index: 10;
-        }
-
-        .tool-btn {
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(197, 160, 89, 0.4);
-            color: #e2e8f0;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .tool-btn:hover, .tool-btn.active {
-            background: var(--primary-gold);
-            color: #0f172a;
-            font-weight: 600;
-        }
-
-        .grid-label-3d {
-            background: rgba(15, 23, 42, 0.9);
-            color: #f8fafc;
-            border: 1px solid #c5a059;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-family: 'Prompt', sans-serif;
-            white-space: nowrap;
-            pointer-events: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            text-align: center;
-        }
-
-        .info-panel {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-light);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            max-height: 780px;
-            overflow-y: auto;
-        }
-
-        .panel-header {
-            border-bottom: 1px solid var(--border-light);
-            padding-bottom: 0.75rem;
-        }
-
-        .panel-header h3 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .panel-header h3 i {
-            color: var(--primary-gold);
-        }
-
-        .boq-table-container {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid var(--border-light);
-            border-radius: 8px;
-        }
-
-        table.boq-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.78rem;
-            text-align: left;
-        }
-
-        table.boq-table th {
-            background: #1e293b;
-            color: #ffffff;
-            padding: 0.5rem;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-
-        table.boq-table td {
-            padding: 0.45rem 0.5rem;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        table.boq-table tr:hover {
-            background-color: #f1f5f9;
-        }
-
-        .info-card {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 1rem;
-            border: 1px solid var(--border-light);
-        }
-
-        .info-card h4 {
-            font-size: 0.95rem;
-            color: #b45309;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            padding: 0.3rem 0;
-            border-bottom: 1px dashed #e2e8f0;
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            color: var(--text-muted);
-        }
-
-        .info-value {
-            font-weight: 600;
-            color: var(--text-main);
-            text-align: right;
-        }
-
-        footer {
-            background-color: #1e293b;
-            color: #94a3b8;
-            text-align: center;
-            padding: 1.25rem;
-            font-size: 0.85rem;
-            margin-top: auto;
-        }
-    </style>
+<style>
+:root {
+    --navy: #17283a;
+    --navy-deep: #0b1420;
+    --gold: #c5a059;
+    --gold-light: #ead6a8;
+    --page: #f1f4f6;
+    --text: #263445;
+    --muted: #68798a;
+    --border: #dce3e9;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: "Prompt", sans-serif; }
+body {
+    min-height: 100vh;
+    color: var(--text);
+    background:
+        radial-gradient(ellipse at 10% 0%, rgba(142,181,207,.15), transparent 35%),
+        radial-gradient(ellipse at 90% 0%, rgba(197,160,89,.12), transparent 30%),
+        var(--page);
+}
+header {
+    color: white;
+    padding: 16px 22px;
+    background: linear-gradient(120deg, #20364b, #101a27);
+    border-bottom: 2px solid var(--gold);
+}
+.header-inner {
+    max-width: 1600px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+h1 { font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 600; }
+.subtitle { color: #c7d2dc; font-size: .78rem; margin-top: 3px; }
+.back-link {
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 30px;
+    padding: 7px 13px;
+}
+.back-link:hover { color: var(--navy); background: var(--gold-light); }
+main { max-width: 1600px; margin: 18px auto; padding: 0 16px; }
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 470px;
+    gap: 16px;
+    align-items: start;
+}
+.card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    box-shadow: 0 12px 32px rgba(25,42,60,.08);
+    overflow: hidden;
+}
+.viewer-heading {
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+}
+.viewer-heading strong { font-size: .92rem; }
+.viewer-heading span { color: var(--muted); font-size: .72rem; }
+#viewer {
+    position: relative;
+    height: min(76vh, 800px);
+    min-height: 510px;
+    background: radial-gradient(circle at 50% 40%, #26394e, #0b1420 76%);
+}
+#viewer canvas { display: block; }
+.viewer-tip {
+    position: absolute;
+    z-index: 2;
+    top: 11px;
+    left: 11px;
+    max-width: calc(100% - 22px);
+    color: #edf2f6;
+    background: rgba(8,18,29,.84);
+    border: 1px solid rgba(197,160,89,.6);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: .72rem;
+    pointer-events: none;
+}
+.toolbar {
+    position: absolute;
+    z-index: 2;
+    left: 11px;
+    bottom: 11px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+.toolbar button,
+.controls button {
+    cursor: pointer;
+    border: 1px solid rgba(197,160,89,.65);
+    border-radius: 7px;
+    padding: 7px 10px;
+    font-size: .72rem;
+}
+.toolbar button { color: #eef2f5; background: rgba(8,18,29,.92); }
+.toolbar button:hover,
+.toolbar button.active { color: #172536; background: var(--gold-light); }
+.panel { padding: 15px; }
+.panel h2 { font-size: 1rem; margin-bottom: 4px; }
+.panel-intro { color: var(--muted); font-size: .72rem; margin-bottom: 12px; }
+.controls { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.controls button {
+    color: var(--navy);
+    background: #f6f8fa;
+    border-color: var(--border);
+}
+.controls button:hover { background: #e9f1f6; }
+.checkline {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #526273;
+    font-size: .74rem;
+    margin: 7px 0 12px;
+}
+.checkline input { accent-color: var(--gold); }
+.table-wrap {
+    max-height: 430px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+table { width: 100%; border-collapse: collapse; font-size: .67rem; white-space: nowrap; }
+th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    color: white;
+    background: var(--navy);
+    text-align: left;
+    padding: 8px 7px;
+}
+td { padding: 7px; border-bottom: 1px solid #e8edf1; }
+tbody tr:hover { background: #f1f7fa; }
+tr.total-row { font-weight: 700; background: #f8f5ed; }
+.summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+}
+.summary-item {
+    padding: 9px;
+    background: #f7f9fb;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.summary-item span { display: block; color: var(--muted); font-size: .66rem; }
+.summary-item strong { display: block; margin-top: 3px; color: #20364b; font-size: .86rem; }
+.notice {
+    margin-top: 12px;
+    padding: 10px;
+    color: #68552f;
+    background: #fff9eb;
+    border: 1px solid #ead8b4;
+    border-radius: 8px;
+    font-size: .7rem;
+    line-height: 1.6;
+}
+.grid-label {
+    padding: 3px 6px;
+    color: white;
+    background: rgba(8,18,29,.9);
+    border: 1px solid var(--gold);
+    border-radius: 5px;
+    text-align: center;
+    font-size: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+.grid-label small { display: block; color: var(--gold-light); font-size: 8px; }
+.error-message {
+    display: none;
+    position: absolute;
+    z-index: 5;
+    top: 60px;
+    left: 12px;
+    right: 12px;
+    padding: 12px;
+    color: #8a1f1f;
+    background: #fff0f0;
+    border: 1px solid #e5bcbc;
+    border-radius: 8px;
+    font-size: .85rem;
+}
+footer {
+    padding: 14px;
+    color: #c4ced8;
+    background: var(--navy);
+    text-align: center;
+    font-size: .74rem;
+}
+@media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; }
+    #viewer { height: 62vh; }
+}
+@media (max-width: 600px) {
+    .header-inner { align-items: flex-start; flex-direction: column; }
+    main { padding: 0 9px; }
+    #viewer { min-height: 440px; height: 56vh; }
+    .viewer-heading { flex-direction: column; }
+    .panel { padding: 11px; }
+}
+</style>
 </head>
+
 <body>
-
-    <header>
-        <div class="header-container">
-            <div class="header-title-group">
-                <h1><i class="fa-solid fa-cube"></i> โมเดล 3D BIM ฐานราก (พร้อมระยะงอปลาย & เหล็กรัดรอบ)</h1>
-            </div>
-            <a href="index.html" class="btn-back">
-                <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
-            </a>
+<header>
+    <div class="header-inner">
+        <div>
+            <h1>ถอดแบบโครงสร้างใต้ดิน — ฐานราก 14 ตำแหน่ง</h1>
+            <div class="subtitle">โมเดล 3D • ทรายหยาบ • คอนกรีตหยาบ • ฐานราก • ตอม่อ • เหล็กงอปลาย • ระยะทาบ</div>
         </div>
-    </header>
-
-    <div class="container">
-        <div class="viewer-layout">
-            
-            <!-- 3D Canvas Box -->
-            <div class="canvas-container">
-                <div class="canvas-overlay-tip">
-                    <i class="fa-solid fa-circle-check" style="color:var(--primary-gold);"></i> แสดงเหล็กตะแกรงงอปลาย (12db) และเหล็กรัดรอบพร้อมระยะทาบ 20 ซม.
-                </div>
-                <div id="webgl-canvas"></div>
-                <div class="canvas-toolbar">
-                    <button class="tool-btn active" id="btn-full" onclick="setSectionMode('full')">มุมมองปกติ</button>
-                    <button class="tool-btn" id="btn-section" onclick="setSectionMode('section')">ผ่าครึ่ง Section Cut</button>
-                </div>
-            </div>
-
-            <!-- BOQ Table & Summary Panel -->
-            <div class="info-panel">
-                <div class="panel-header">
-                    <h3><i class="fa-solid fa-calculator"></i> ถอดแบบปริมาณงาน (BOQ) 14 ต้น</h3>
-                </div>
-
-                <div class="boq-table-container">
-                    <table class="boq-table" id="boq-table">
-                        <thead>
-                            <tr>
-                                <th>Grid</th>
-                                <th>ฐานราก</th>
-                                <th>สเปกเหล็ก + ระยะงอ</th>
-                                <th>ปูน (m³)</th>
-                                <th>เหล็กรวม (kg)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="boq-tbody">
-                            <!-- บรรจุข้อมูลอัตโนมัติ -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="info-card">
-                    <h4>สรุปยอดรวมทั้งโครงการ (14 ต้น)</h4>
-                    <div class="info-row"><span class="info-label">ปริมาตรคอนกรีตรวม (ฐานราก+ตอม่อ):</span><span class="info-value" id="total-conc-vol" style="color:#0284c7;">- m³</span></div>
-                    <div class="info-row"><span class="info-label">น้ำหนักเหล็กเสริมรวม (รวมระยะงอปลาย + Waste 7%):</span><span class="info-value" id="total-rebar-weight" style="color:#b45309; font-size:1rem;">- kg</span></div>
-                </div>
-            </div>
-
-        </div>
+        <a class="back-link" href="index.html">← กลับหน้าหลัก</a>
     </div>
+</header>
 
-    <footer>
-        <p>&copy; 2026 Structural Estimation System &bull; Rebar Anchorage & Hook Engine. All Rights Reserved.</p>
-    </footer>
+<main>
+    <div class="layout">
+        <section class="card">
+            <div class="viewer-heading">
+                <strong>โมเดลแปลนฐานรากและเหล็กเสริม</strong>
+                <span>ลากเพื่อหมุน • เลื่อนเพื่อซูม</span>
+            </div>
 
-    <script>
-        // ข้อมูลสเปกฐานรากตามแบบแปลนจริง
-        const detailedFoundationData = {
-            "A1": { name: "F0.60x0.60", thick: 0.20, width: 0.60, length: 0.60, rebarType: "RB9", countX: 4, countY: 4, db: 9, colDb: 12 },
-            "A2": { name: "F0.60x0.60", thick: 0.20, width: 0.60, length: 0.60, rebarType: "RB9", countX: 4, countY: 4, db: 9, colDb: 12 },
-            
-            "B1": { name: "F1.30x1.30", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colDb: 12 },
-            "B2": { name: "F1.30x1.30", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colDb: 12 },
-            "B3": { name: "F0.90x0.90", thick: 0.20, width: 0.90, length: 0.90, rebarType: "RB9", countX: 4, countY: 4, db: 9, colDb: 12 },
+            <div id="viewer">
+                <div class="viewer-tip">
+                    กด “ซ่อนคอนกรีต” เพื่อดูเหล็ก • หมุนและซูมเพื่อดูแต่ละ Grid
+                </div>
+                <div class="error-message" id="errorMessage"></div>
+                <div class="toolbar">
+                    <button id="toggleConcrete" class="active" type="button">ซ่อนคอนกรีต</button>
+                    <button id="toggleLayers" class="active" type="button">ซ่อนชั้นวัสดุ</button>
+                    <button id="resetCamera" type="button">มุมมองทั้งหมด</button>
+                </div>
+            </div>
+        </section>
 
-            "C1": { name: "F1.30x1.30", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colDb: 12 },
-            "C2": { name: "F1.50x1.50", thick: 0.30, width: 1.50, length: 1.50, rebarType: "DB12", countX: 5, countY: 5, db: 12, colDb: 12 },
-            "C3": { name: "F1.30x1.30", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colDb: 12 },
+        <aside class="card panel">
+            <h2>รายการถอดแบบเบื้องต้น</h2>
+            <div class="panel-intro">แสดงปริมาณแยกตาม Grid พร้อมระยะงอและระยะทาบ</div>
 
-            "D1": { name: "F1.30x1.30", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colDb: 12 },
-            "D2": { name: "F1.40x1.40", thick: 0.25, width: 1.40, length: 1.40, rebarType: "DB16", countX: 6, countY: 6, db: 16, colDb: 16 },
-            "D3": { name: "F1.30x1.30", thick: 0.25, width: 1.30, length: 1.30, rebarType: "DB12", countX: 7, countY: 7, db: 12, colDb: 12 },
+            <div class="controls">
+                <button id="topView" type="button">มุมมองด้านบน</button>
+                <button id="isoView" type="button">มุมมอง 3D</button>
+            </div>
 
-            "E1": { name: "F0.90x0.90", thick: 0.20, width: 0.90, length: 0.90, rebarType: "RB9", countX: 4, countY: 4, db: 9, colDb: 12 },
-            "E2": { name: "F1.00x1.00", thick: 0.20, width: 1.00, length: 1.00, rebarType: "DB12", countX: 5, countY: 5, db: 12, colDb: 12 },
-            "E3": { name: "F0.90x0.90", thick: 0.20, width: 0.90, length: 0.90, rebarType: "RB9", countX: 4, countY: 4, db: 9, colDb: 12 }
-        };
+            <label class="checkline">
+                <input id="showLabels" type="checkbox" checked>
+                แสดงชื่อ Grid บนโมเดล
+            </label>
 
-        const unitWeight = { 6: 0.222, 9: 0.499, 12: 0.888, 16: 1.578 };
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Grid</th>
+                            <th>ฐานราก</th>
+                            <th>คอนกรีต (m³)</th>
+                            <th>ทราย (m³)</th>
+                            <th>งอ (ม.)</th>
+                            <th>ทาบ (ม.)</th>
+                            <th>เหล็ก (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="boqBody"></tbody>
+                </table>
+            </div>
 
-        // คำนวณปริมาณงานรวมระยะงอปลาย (Hook = 12db) และเหล็กรัดรอบรอบฐานราก
-        function calculateEngineeringSpecs(id) {
-            const data = detailedFoundationData[id];
-            const w = data.width;
-            const l = data.length;
-            const th = data.thick;
-            const db = data.db;
-            const colDb = data.colDb;
+            <div class="summary">
+                <div class="summary-item"><span>จำนวนฐานราก</span><strong id="sumCount">-</strong></div>
+                <div class="summary-item"><span>คอนกรีตฐาน+ตอม่อ</span><strong id="sumConcrete">-</strong></div>
+                <div class="summary-item"><span>คอนกรีตหยาบ</span><strong id="sumLean">-</strong></div>
+                <div class="summary-item"><span>ทรายหยาบ</span><strong id="sumSand">-</strong></div>
+                <div class="summary-item"><span>เหล็กก่อนเผื่อ</span><strong id="sumSteel">-</strong></div>
+                <div class="summary-item"><span>เหล็กหลังเผื่อ</span><strong id="sumSteelWaste">-</strong></div>
+            </div>
 
-            const cover = 0.05; // Concrete Cover 5 ซม.
-            const netW = w - (2 * cover);
-            const netL = l - (2 * cover);
+            <div class="notice">
+                <strong>หมายเหตุ:</strong> ค่า 12db สำหรับงอปลาย, 40db สำหรับทาบเหล็กยืน,
+                ระยะหุ้ม 5 ซม. และระยะฝังเหล็กเป็นค่าตั้งต้นสำหรับโมเดล
+                ต้องตรวจสอบกับแบบขยายและให้วิศวกรผู้รับผิดชอบยืนยันก่อนใช้ก่อสร้าง
+            </div>
+        </aside>
+    </div>
+</main>
 
-            const hookM = (12 * db) / 1000; // ระยะงอปลายเหล็กตะแกรงฐานราก 12db (ม.)
-            const lapM = (40 * colDb) / 1000; // ระยะทาบเหล็กเสาตอม่อ
-            
-            // 1. เหล็กตะแกรงฐานราก (รวมงอปลายขึ้นด้านบน)
-            const lenX = netW + (2 * hookM);
-            const lenY = netL + (2 * hookM);
-            const totalFootingRebarLen = (data.countX * lenX) + (data.countY * lenY);
-            const footingRebarWeight = totalFootingRebarLen * unitWeight[db];
+<footer>Structural Estimation System • โมเดลและรายการปริมาณเพื่อการตรวจสอบเบื้องต้น</footer>
 
-            // 2. เหล็กรัดรอบฐานราก (1 เส้นรัดรอบ + ระยะทาบงอปลาย 0.20 ม.)
-            const tiePerimeter = 2 * (netW + netL) + 0.20;
-            const tieWeight = tiePerimeter * unitWeight[9];
+<script>
+"use strict";
 
-            // 3. เหล็กยืนเสาตอม่อ (4 เส้น)
-            const colHeight = 1.50 + lapM + 0.20;
-            const colRebarWeight = (4 * colHeight) * unitWeight[colDb];
+if (!window.THREE || !THREE.OrbitControls || !THREE.CSS2DRenderer) {
+    const error = document.getElementById("errorMessage");
+    error.style.display = "block";
+    error.textContent =
+        "โหลด Three.js ไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ต แล้วเปิดไฟล์ผ่าน Live Server หรือ GitHub Pages";
+    throw new Error("Three.js หรือส่วนเสริมโหลดไม่สำเร็จ");
+}
 
-            // 4. เหล็กปลอกเสาตอม่อ (Spacing @ 0.15 ม.)
-            const colStirrupCount = Math.ceil((1.50 - th) / 0.15);
-            const stirrupWeight = (colStirrupCount * ((2 * (0.20 + 0.20) - 0.08) + 0.15)) * unitWeight[6];
+/* ข้อมูลตำแหน่งและขนาดฐานราก */
+const foundations = [
+    { id: "A1", x: -3.5, z:  5.35, name: "F0.60×0.60", w: 0.60, l: 0.60, t: 0.20, dia: 9,  nx: 4, ny: 4, colDia: 12 },
+    { id: "A2", x:  0.0, z:  5.35, name: "F0.60×0.60", w: 0.60, l: 0.60, t: 0.20, dia: 9,  nx: 4, ny: 4, colDia: 12 },
+    { id: "B1", x: -3.5, z:  3.85, name: "F1.30×1.30", w: 1.30, l: 1.30, t: 0.25, dia: 12, nx: 7, ny: 7, colDia: 12 },
+    { id: "B2", x:  0.0, z:  3.85, name: "F1.30×1.30", w: 1.30, l: 1.30, t: 0.25, dia: 12, nx: 7, ny: 7, colDia: 12 },
+    { id: "B3", x:  3.0, z:  3.85, name: "F0.90×0.90", w: 0.90, l: 0.90, t: 0.20, dia: 9,  nx: 4, ny: 4, colDia: 12 },
+    { id: "C1", x: -3.5, z: -0.15, name: "F1.30×1.30", w: 1.30, l: 1.30, t: 0.25, dia: 12, nx: 7, ny: 7, colDia: 12 },
+    { id: "C2", x:  0.0, z: -0.15, name: "F1.50×1.50", w: 1.50, l: 1.50, t: 0.30, dia: 12, nx: 5, ny: 5, colDia: 12 },
+    { id: "C3", x:  3.0, z: -0.15, name: "F1.30×1.30", w: 1.30, l: 1.30, t: 0.25, dia: 12, nx: 7, ny: 7, colDia: 12 },
+    { id: "D1", x: -3.5, z: -2.35, name: "F1.30×1.30", w: 1.30, l: 1.30, t: 0.25, dia: 12, nx: 7, ny: 7, colDia: 12 },
+    { id: "D2", x:  0.0, z: -2.35, name: "F1.40×1.40", w: 1.40, l: 1.40, t: 0.25, dia: 16, nx: 6, ny: 6, colDia: 16 },
+    { id: "D3", x:  3.0, z: -2.35, name: "F1.30×1.30", w: 1.30, l: 1.30, t: 0.25, dia: 12, nx: 7, ny: 7, colDia: 12 },
+    { id: "E1", x: -3.5, z: -5.35, name: "F0.90×0.90", w: 0.90, l: 0.90, t: 0.20, dia: 9,  nx: 4, ny: 4, colDia: 12 },
+    { id: "E2", x:  0.0, z: -5.35, name: "F1.00×1.00", w: 1.00, l: 1.00, t: 0.20, dia: 12, nx: 5, ny: 5, colDia: 12 },
+    { id: "E3", x:  3.0, z: -5.35, name: "F0.90×0.90", w: 0.90, l: 0.90, t: 0.20, dia: 9,  nx: 4, ny: 4, colDia: 12 }
+];
 
-            const rawWeight = footingRebarWeight + tieWeight + colRebarWeight + stirrupWeight;
-            const finalWeight = (rawWeight * 1.07).toFixed(1); // เผื่อ Waste 7%
-            
-            const footingVol = w * l * th;
-            const colVol = 0.20 * 0.20 * 1.50;
-            const totalVol = (footingVol + colVol).toFixed(3);
+/* ค่าตั้งต้นเพื่อแสดงโมเดลและประมาณปริมาณ */
+const SET = {
+    cover: 0.05,
+    pedestalW: 0.20,
+    pedestalL: 0.20,
+    totalHeightFromFootingBottom: 1.50,
 
-            return {
-                weight: parseFloat(finalWeight),
-                volume: parseFloat(totalVol)
-            };
+    sandT: 0.10,
+    leanT: 0.10,
+    leanOver: 0.05,
+
+    tieDia: 9,
+    tieTail: 0.20,
+    tieCornerRadius: 0.035,
+
+    hookFactor: 12,
+    columnLapFactor: 40,
+    columnAnchorFactor: 12,
+    spliceVisualOffset: 0.012,
+
+    stirrupDia: 6,
+    stirrupSpacing: 0.15,
+    waste: 0.07
+};
+
+function weightPerMeter(diameterMm) {
+    return diameterMm * diameterMm / 162;
+}
+
+function fmt(number, digits = 3) {
+    return Number(number).toLocaleString("th-TH", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+    });
+}
+
+const viewer = document.getElementById("viewer");
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b1420);
+
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+camera.position.set(13, 13, 16);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+viewer.appendChild(renderer.domElement);
+
+const labelRenderer = new THREE.CSS2DRenderer();
+labelRenderer.domElement.style.position = "absolute";
+labelRenderer.domElement.style.inset = "0";
+labelRenderer.domElement.style.pointerEvents = "none";
+viewer.appendChild(labelRenderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 0.7, 0);
+controls.maxPolarAngle = Math.PI * 0.49;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x46515e, 1.35));
+
+const keyLight = new THREE.DirectionalLight(0xfff0d8, 1.8);
+keyLight.position.set(8, 18, 10);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(2048, 2048);
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x9bc9e8, 0.65);
+fillLight.position.set(-10, 8, -7);
+scene.add(fillLight);
+
+const world = new THREE.Group();
+scene.add(world);
+
+const concreteGroup = new THREE.Group();
+const steelGroup = new THREE.Group();
+const layerGroup = new THREE.Group();
+const labelGroup = new THREE.Group();
+world.add(layerGroup, concreteGroup, steelGroup, labelGroup);
+
+const concreteMat = new THREE.MeshStandardMaterial({
+    color: 0xbcc5cc,
+    roughness: 0.86,
+    transparent: true,
+    opacity: 0.48
+});
+const leanMat = new THREE.MeshStandardMaterial({
+    color: 0x77838e,
+    roughness: 0.96
+});
+const sandMat = new THREE.MeshStandardMaterial({
+    color: 0xb79a6b,
+    roughness: 1
+});
+const footingBarMat = new THREE.MeshStandardMaterial({
+    color: 0xc58d34,
+    roughness: 0.32,
+    metalness: 0.72
+});
+const verticalBarMat = new THREE.MeshStandardMaterial({
+    color: 0x53afd4,
+    roughness: 0.3,
+    metalness: 0.65
+});
+const lapBarMat = new THREE.MeshStandardMaterial({
+    color: 0xe7b14e,
+    roughness: 0.3,
+    metalness: 0.7
+});
+
+let concreteVisible = true;
+let layersVisible = true;
+
+function addBox(parent, w, h, d, material, x, y, z, drawEdges = true) {
+    const geometry = new THREE.BoxGeometry(w, h, d);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    parent.add(mesh);
+
+    if (drawEdges) {
+        const edge = new THREE.LineSegments(
+            new THREE.EdgesGeometry(geometry),
+            new THREE.LineBasicMaterial({
+                color: 0x26384a,
+                transparent: true,
+                opacity: 0.72
+            })
+        );
+        edge.position.copy(mesh.position);
+        parent.add(edge);
+    }
+
+    return mesh;
+}
+
+function curveFrom(points, closed = false) {
+    const vectors = points.map(p => new THREE.Vector3(p[0], p[1], p[2]));
+    return new THREE.CatmullRomCurve3(vectors, closed, "centripetal");
+}
+
+/* ปรับมุมแนวเหล็กเปิดให้โค้งมนโดยไม่ยื่นเลยจุดควบคุม */
+function createRoundedOpenPath(points, radius) {
+    const p = points.map(v => new THREE.Vector3(v[0], v[1], v[2]));
+    const path = new THREE.CurvePath();
+    let cursor = p[0].clone();
+
+    for (let i = 1; i < p.length - 1; i++) {
+        const corner = p[i];
+        const previous = p[i - 1];
+        const next = p[i + 1];
+
+        const r = Math.min(
+            radius,
+            corner.distanceTo(previous) * 0.4,
+            corner.distanceTo(next) * 0.4
+        );
+
+        if (r <= 0.001) continue;
+
+        const start = corner.clone().add(
+            previous.clone().sub(corner).normalize().multiplyScalar(r)
+        );
+        const end = corner.clone().add(
+            next.clone().sub(corner).normalize().multiplyScalar(r)
+        );
+
+        if (cursor.distanceTo(start) > 0.001) {
+            path.add(new THREE.LineCurve3(cursor.clone(), start.clone()));
         }
 
-        // Texture สร้างผิวคอนกรีตและทราย
-        function createNoiseTexture(density, opacity) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 256; canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#808080';
-            ctx.fillRect(0, 0, 256, 256);
-            for (let i = 0; i < density; i++) {
-                const x = Math.random() * 256; const y = Math.random() * 256;
-                const val = Math.floor(Math.random() * 255);
-                ctx.fillStyle = `rgba(${val},${val},${val},${opacity})`;
-                ctx.fillRect(x, y, 2, 2);
-            }
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(4, 4);
-            return texture;
+        path.add(new THREE.QuadraticBezierCurve3(
+            start.clone(),
+            corner.clone(),
+            end.clone()
+        ));
+
+        cursor = end.clone();
+    }
+
+    const last = p[p.length - 1];
+    if (cursor.distanceTo(last) > 0.001) {
+        path.add(new THREE.LineCurve3(cursor, last.clone()));
+    }
+
+    return path;
+}
+
+function addRebar(parent, points, diameterMm, material, closed = false) {
+    const bendRadius = Math.max((diameterMm / 1000) * 4, 0.01);
+    const curve = closed
+        ? curveFrom(points, true)
+        : createRoundedOpenPath(points, bendRadius);
+
+    const length = curve.getLength();
+    const geometry = new THREE.TubeGeometry(
+        curve,
+        Math.max(48, points.length * 12),
+        diameterMm / 2000,
+        8,
+        closed
+    );
+
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    parent.add(mesh);
+
+    return length;
+}
+
+function roundedLoop(halfW, halfL, radius, y) {
+    const r = Math.max(0.008, Math.min(radius, halfW * 0.4, halfL * 0.4));
+    const corners = [
+        { x: halfW - r,  z: -halfL + r, a0: -90, a1: 0 },
+        { x: halfW - r,  z:  halfL - r, a0: 0,   a1: 90 },
+        { x: -halfW + r, z:  halfL - r, a0: 90,  a1: 180 },
+        { x: -halfW + r, z: -halfL + r, a0: 180, a1: 270 }
+    ];
+
+    const points = [];
+    for (const corner of corners) {
+        for (let i = 0; i <= 6; i++) {
+            const angle =
+                (corner.a0 + (corner.a1 - corner.a0) * i / 6) * Math.PI / 180;
+            points.push([
+                corner.x + r * Math.cos(angle),
+                y,
+                corner.z + r * Math.sin(angle)
+            ]);
+        }
+    }
+    return points;
+}
+
+function hookedBarX(x1, x2, y, z, hookHeight, diameterMm) {
+    const bend = Math.min(
+        Math.max(diameterMm * 4 / 1000, 0.01),
+        Math.max(hookHeight * 0.35, 0.01),
+        (x2 - x1) / 5
+    );
+
+    return [
+        [x1, y + hookHeight, z],
+        [x1, y + bend, z],
+        [x1 + bend, y, z],
+        [x2 - bend, y, z],
+        [x2, y + bend, z],
+        [x2, y + hookHeight, z]
+    ];
+}
+
+function hookedBarZ(z1, z2, y, x, hookHeight, diameterMm) {
+    const bend = Math.min(
+        Math.max(diameterMm * 4 / 1000, 0.01),
+        Math.max(hookHeight * 0.35, 0.01),
+        (z2 - z1) / 5
+    );
+
+    return [
+        [x, y + hookHeight, z1],
+        [x, y + bend, z1],
+        [x, y, z1 + bend],
+        [x, y, z2 - bend],
+        [x, y + bend, z2],
+        [x, y + hookHeight, z2]
+    ];
+}
+
+function addLine(a, b) {
+    const geometry = new THREE.BufferGeometry().setFromPoints([a, b]);
+    world.add(new THREE.Line(
+        geometry,
+        new THREE.LineBasicMaterial({
+            color: 0x536477,
+            transparent: true,
+            opacity: 0.55
+        })
+    ));
+}
+
+/* เส้นกริดแปลน */
+[5.35, 3.85, -0.15, -2.35, -5.35].forEach(z => {
+    addLine(new THREE.Vector3(-4.5, 0.025, z), new THREE.Vector3(4.0, 0.025, z));
+});
+[-3.5, 0, 3].forEach(x => {
+    addLine(new THREE.Vector3(x, 0.025, 6.2), new THREE.Vector3(x, 0.025, -6.2));
+});
+
+function addFoundation(item) {
+    const footingBottom = 0;
+    const footingTop = item.t;
+    const pedestalHeight = Math.max(
+        0.1,
+        SET.totalHeightFromFootingBottom - item.t
+    );
+    const pedestalTop = footingTop + pedestalHeight;
+
+    const leanW = item.w + 2 * SET.leanOver;
+    const leanL = item.l + 2 * SET.leanOver;
+
+    const foundationLayers = new THREE.Group();
+    foundationLayers.position.set(item.x, 0, item.z);
+
+    // ทรายหยาบ
+    addBox(
+        foundationLayers,
+        leanW + 0.10,
+        SET.sandT,
+        leanL + 0.10,
+        sandMat,
+        0,
+        -SET.leanT - SET.sandT / 2,
+        0,
+        false
+    );
+
+    // คอนกรีตหยาบ
+    addBox(
+        foundationLayers,
+        leanW,
+        SET.leanT,
+        leanL,
+        leanMat,
+        0,
+        -SET.leanT / 2,
+        0,
+        false
+    );
+    layerGroup.add(foundationLayers);
+
+    // คอนกรีตฐานรากและตอม่อ
+    const concrete = new THREE.Group();
+    concrete.position.set(item.x, 0, item.z);
+
+    addBox(
+        concrete, item.w, item.t, item.l,
+        concreteMat.clone(),
+        0, footingBottom + item.t / 2, 0
+    );
+
+    addBox(
+        concrete, SET.pedestalW, pedestalHeight, SET.pedestalL,
+        concreteMat.clone(),
+        0, footingTop + pedestalHeight / 2, 0
+    );
+
+    concreteGroup.add(concrete);
+
+    // เหล็กทั้งหมดของฐานนี้
+    const steel = new THREE.Group();
+    steel.position.set(item.x, 0, item.z);
+
+    /* เหล็กตะแกรงฐานรากพร้อมงอปลาย */
+    const innerX = item.w / 2 - SET.cover - item.dia / 2000;
+    const innerZ = item.l / 2 - SET.cover - item.dia / 2000;
+    const barY = footingBottom + SET.cover + item.dia / 2000;
+    const barRadius = item.dia / 2000;
+
+    // จำกัดความสูงงอให้อยู่ในฐานรากและเหลือ cover ด้านบน
+    const maxHookHeight = Math.max(
+        0,
+        item.t - SET.cover - barRadius - barY
+    );
+
+    const hookHeight = Math.min(
+        SET.hookFactor * item.dia / 1000,
+        item.t * 0.65,
+        maxHookHeight
+    );
+
+    let footingBarLength = 0;
+    let hookLengthTotal = 0;
+
+    for (let i = 0; i < item.nx; i++) {
+        const z = -innerZ + (2 * innerZ * i) / Math.max(1, item.nx - 1);
+        const points = hookedBarX(
+            -innerX, innerX, barY, z, hookHeight, item.dia
+        );
+        const length = addRebar(steel, points, item.dia, footingBarMat);
+        footingBarLength += length;
+        hookLengthTotal += Math.max(0, length - 2 * innerX);
+    }
+
+    for (let i = 0; i < item.ny; i++) {
+        const x = -innerX + (2 * innerX * i) / Math.max(1, item.ny - 1);
+        const points = hookedBarZ(
+            -innerZ,
+            innerZ,
+            barY + item.dia / 1000,
+            x,
+            hookHeight,
+            item.dia
+        );
+        const length = addRebar(steel, points, item.dia, footingBarMat);
+        footingBarLength += length;
+        hookLengthTotal += Math.max(0, length - 2 * innerZ);
+    }
+
+    /* เหล็กรัดรอบฐานรากและหางพับเข้าด้านใน */
+    const tieHalfW = item.w / 2 - SET.cover - SET.tieDia / 2000;
+    const tieHalfL = item.l / 2 - SET.cover - SET.tieDia / 2000;
+    const tieY = item.t * 0.55;
+
+    const tiePoints = roundedLoop(
+        tieHalfW,
+        tieHalfL,
+        SET.tieCornerRadius,
+        tieY
+    );
+
+    const tieLoopLength = addRebar(
+        steel, tiePoints, SET.tieDia, lapBarMat, true
+    );
+
+    const tieStart = tiePoints[0];
+    const tieHookLeg = Math.min(0.06, tieHalfL * 0.30);
+    const tieRun = Math.min(
+        Math.max(0.02, SET.tieTail - tieHookLeg),
+        tieHalfW * 0.65
+    );
+
+    const tieTailPath = [
+        tieStart,
+        [tieStart[0] - tieRun, tieStart[1], tieStart[2]],
+        [tieStart[0] - tieRun, tieStart[1], tieStart[2] + tieHookLeg]
+    ];
+
+    const tieTailLength = addRebar(
+        steel, tieTailPath, SET.tieDia, lapBarMat
+    );
+
+    const tieLength = tieLoopLength + tieTailLength;
+
+    /*
+     * เหล็กสตาร์ตเตอร์ตอม่อ:
+     * ขาฝังเข้าในฐานราก → โค้งขึ้นเป็นเหล็กยืน → ซ้อนทาบกับเหล็กท่อนบน
+     */
+    const stirrupCenterHalfW =
+        SET.pedestalW / 2 - SET.cover - SET.stirrupDia / 2000;
+    const stirrupCenterHalfL =
+        SET.pedestalL / 2 - SET.cover - SET.stirrupDia / 2000;
+
+    const colInsetX = Math.max(
+        0.01,
+        stirrupCenterHalfW - SET.stirrupDia / 1000 - item.colDia / 2000
+    );
+    const colInsetZ = Math.max(
+        0.01,
+        stirrupCenterHalfL - SET.stirrupDia / 1000 - item.colDia / 2000
+    );
+
+    const verticalTopY = pedestalTop - SET.cover;
+    const lapLengthEach = SET.columnLapFactor * item.colDia / 1000;
+    const availablePedestalHeight = verticalTopY - footingTop;
+
+    // ป้องกันระยะทาบยาวเกินช่วงตอม่อ
+    const actualLapLength = Math.min(
+        lapLengthEach,
+        Math.max(0.05, availablePedestalHeight * 0.65)
+    );
+
+    const lapStartY =
+        footingTop +
+        Math.max(SET.cover, (availablePedestalHeight - actualLapLength) / 2);
+
+    const lapEndY = lapStartY + actualLapLength;
+
+    const verticalPositions = [
+        [-colInsetX, -colInsetZ],
+        [ colInsetX, -colInsetZ],
+        [ colInsetX,  colInsetZ],
+        [-colInsetX,  colInsetZ]
+    ];
+
+    let verticalLength = 0;
+    let totalColumnLapLength = 0;
+
+    verticalPositions.forEach(([x, z], index) => {
+        const bendRadius = Math.min(
+            Math.max(item.colDia * 4 / 1000, 0.012),
+            item.t * 0.22
+        );
+
+        const anchorY = footingBottom + SET.cover + item.colDia / 2000;
+        const requestedAnchor = SET.columnAnchorFactor * item.colDia / 1000;
+
+        // สลับทิศขาฝังให้แยกกัน ไม่กองซ้อนจุดเดียว
+        const useXDirection = index % 2 === 0;
+        const inwardX = x >= 0 ? -1 : 1;
+        const inwardZ = z >= 0 ? -1 : 1;
+
+        const maxAnchorX =
+            item.w / 2 - SET.cover - item.colDia / 2000 - Math.abs(x);
+        const maxAnchorZ =
+            item.l / 2 - SET.cover - item.colDia / 2000 - Math.abs(z);
+
+        const anchorLength = Math.max(
+            0.02,
+            Math.min(
+                requestedAnchor,
+                (useXDirection ? maxAnchorX : maxAnchorZ) - bendRadius
+            )
+        );
+
+        let starterPath;
+
+        if (useXDirection) {
+            const endX = x + inwardX * (anchorLength + bendRadius);
+            const tangentX = x + inwardX * bendRadius;
+
+            starterPath = [
+                [endX, anchorY, z],
+                [tangentX, anchorY, z],
+                [x, anchorY + bendRadius, z],
+                [x, lapEndY, z]
+            ];
+        } else {
+            const endZ = z + inwardZ * (anchorLength + bendRadius);
+            const tangentZ = z + inwardZ * bendRadius;
+
+            starterPath = [
+                [x, anchorY, endZ],
+                [x, anchorY, tangentZ],
+                [x, anchorY + bendRadius, z],
+                [x, lapEndY, z]
+            ];
         }
 
-        const sandBumpTexture = createNoiseTexture(5000, 0.8);
-        const leanBumpTexture = createNoiseTexture(3000, 0.5);
+        // เหล็กสตาร์ตเตอร์เป็นเส้นต่อเนื่อง มีขาฝังและงอขึ้น
+        verticalLength += addRebar(
+            steel, starterPath, item.colDia, verticalBarMat
+        );
 
-        // Three.js Scene Setup
-        const container = document.getElementById('webgl-canvas');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0b1120);
+        // เหล็กท่อนบนซ้อนทาบ: offset เล็กน้อยเพื่อให้เห็นสองท่อนในภาพ
+        const offsetDirection = index % 2 === 0 ? 1 : -1;
+        const visualOffset = offsetDirection * Math.min(
+            SET.spliceVisualOffset,
+            item.colDia / 1000
+        );
 
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        camera.position.set(0, 14, 18);
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        container.appendChild(renderer.domElement);
-
-        const labelRenderer = new THREE.CSS2DRenderer();
-        labelRenderer.setSize(container.clientWidth, container.clientHeight);
-        labelRenderer.domElement.style.position = 'absolute';
-        labelRenderer.domElement.style.top = '0px';
-        labelRenderer.domElement.style.pointerEvents = 'none';
-        container.appendChild(labelRenderer.domElement);
-
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-        const dirLight = new THREE.DirectionalLight(0xfff5e6, 0.9);
-        dirLight.position.set(15, 25, 15);
-        dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
-        scene.add(dirLight);
-
-        // ชั้นทราย & คอนกรีตหยาบ
-        const sandMesh = new THREE.Mesh(new THREE.BoxGeometry(10, 0.10, 14), new THREE.MeshStandardMaterial({ color: 0xc2a679, roughness: 0.95, bumpMap: sandBumpTexture, bumpScale: 0.015 }));
-        sandMesh.position.set(0, -0.05, 0); sandMesh.receiveShadow = true;
-        scene.add(sandMesh);
-
-        const leanMesh = new THREE.Mesh(new THREE.BoxGeometry(9.6, 0.10, 13.6), new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.85, bumpMap: leanBumpTexture, bumpScale: 0.008 }));
-        leanMesh.position.set(0, 0.05, 0); leanMesh.receiveShadow = true;
-        scene.add(leanMesh);
-
-        // Grid Lines ตามแปลน
-        const gridMaterial = new THREE.LineBasicMaterial({ color: 0x475569, transparent: true, opacity: 0.6 });
-        [5.35, 3.85, -0.15, -2.35, -5.35].forEach(z => {
-            scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-4.5, 0, z), new THREE.Vector3(4.0, 0, z)]), gridMaterial));
-        });
-        [-3.5, 0.0, 3.0].forEach(x => {
-            scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x, 0, 6.2), new THREE.Vector3(x, 0, -6.2)]), gridMaterial));
-        });
-
-        const gridPositions = [
-            { id: "A1", x: -3.5, z: 5.35 }, { id: "A2", x: 0.0, z: 5.35 },
-            { id: "B1", x: -3.5, z: 3.85 }, { id: "B2", x: 0.0, z: 3.85 }, { id: "B3", x: 3.0, z: 3.85 },
-            { id: "C1", x: -3.5, z: -0.15 }, { id: "C2", x: 0.0, z: -0.15 }, { id: "C3", x: 3.0, z: -0.15 },
-            { id: "D1", x: -3.5, z: -2.35 }, { id: "D2", x: 0.0, z: -2.35 }, { id: "D3", x: 3.0, z: -2.35 },
-            { id: "E1", x: -3.5, z: -5.35 }, { id: "E2", x: 0.0, z: -5.35 }, { id: "E3", x: 3.0, z: -5.35 }
-        ];
-
-        const allGroups = [];
-        const concreteBodyMat = new THREE.MeshPhysicalMaterial({ color: 0xcbd5e1, transparent: true, opacity: 0.25, roughness: 0.2, metalness: 0.1, transmission: 0.4 });
-        const edgeMaterial = new THREE.LineBasicMaterial({ color: 0x334155, linewidth: 1.5 });
-        const rebarMaterial = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.35, metalness: 0.75 });
-        const colRebarMaterial = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.35, metalness: 0.75 });
-        const spacerMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 });
-
-        function createCylinderBetweenPoints(p1, p2, radius, material) {
-            const direction = new THREE.Vector3().subVectors(p2, p1);
-            const height = direction.length();
-            const geometry = new THREE.CylinderGeometry(radius, radius, height, 8);
-            const cylinder = new THREE.Mesh(geometry, material);
-            cylinder.castShadow = true;
-            cylinder.position.copy(new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5));
-            cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
-            return cylinder;
-        }
-
-        let grandTotalWeight = 0;
-        let grandTotalVolume = 0;
-        const boqTbody = document.getElementById('boq-tbody');
-
-        gridPositions.forEach(pos => {
-            const group = new THREE.Group();
-            const data = detailedFoundationData[pos.id];
-            const w = data.width, l = data.length, th = data.thick;
-            const halfW = w / 2, halfL = l / 2;
-
-            // 1. คอนกรีตฐานราก
-            const fMesh = new THREE.Mesh(new THREE.BoxGeometry(w, th, l), concreteBodyMat.clone());
-            fMesh.position.y = 0.10 + (th / 2); fMesh.castShadow = true; fMesh.receiveShadow = true;
-            group.add(fMesh);
-            group.add(new THREE.LineSegments(new THREE.EdgesGeometry(fMesh.geometry), edgeMaterial)).position.copy(fMesh.position);
-
-            // 2. คอนกรีตเสาตอม่อ
-            const colH = 1.50 - th;
-            const cMesh = new THREE.Mesh(new THREE.BoxGeometry(0.20, colH, 0.20), concreteBodyMat);
-            cMesh.position.y = 0.10 + th + (colH / 2); cMesh.castShadow = true;
-            group.add(cMesh);
-            group.add(new THREE.LineSegments(new THREE.EdgesGeometry(cMesh.geometry), edgeMaterial)).position.copy(cMesh.position);
-
-            // ลูกปูนหนุน
-            const cover = 0.05;
-            const innerHalfW = halfW - cover, innerHalfL = halfL - cover;
-            [-innerHalfW + 0.08, innerHalfW - 0.08].forEach(sx => {
-                [-innerHalfL + 0.08, innerHalfL - 0.08].forEach(sz => {
-                    const spacer = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.05), spacerMat);
-                    spacer.position.set(sx, 0.10 + 0.025, sz);
-                    group.add(spacer);
-                });
-            });
-
-            // 3. เหล็กเสริมฐานราก + ระยะงอปลาย (Hook 12db)
-            const rebarGroup = new THREE.Group();
-            const rebarRadius = (data.db / 2000) * 2.2;
-            const tieRadius = (9 / 2000) * 2.2;
-            const stepX = (innerHalfL * 2) / (data.countX - 1);
-            const stepY = (innerHalfW * 2) / (data.countY - 1);
-            const hookH = th * 0.6; // ความสูงงอปลายขึ้นด้านบน
-
-            // ตะแกรง X พร้อมงอปลาย
-            for(let i = 0; i < data.countX; i++) {
-                const z = -innerHalfL + (i * stepX);
-                rebarGroup.add(createCylinderBetweenPoints(new THREE.Vector3(-innerHalfW, 0.13, z), new THREE.Vector3(innerHalfW, 0.13, z), rebarRadius, rebarMaterial));
-                rebarGroup.add(createCylinderBetweenPoints(new THREE.Vector3(-innerHalfW, 0.13, z), new THREE.Vector3(-innerHalfW, 0.13 + hookH, z), rebarRadius, rebarMaterial));
-                rebarGroup.add(createCylinderBetweenPoints(new THREE.Vector3(innerHalfW, 0.13, z), new THREE.Vector3(innerHalfW, 0.13 + hookH, z), rebarRadius, rebarMaterial));
-            }
-            // ตะแกรง Y พร้อมงอปลาย
-            for(let i = 0; i < data.countY; i++) {
-                const x = -innerHalfW + (i * stepY);
-                rebarGroup.add(createCylinderBetweenPoints(new THREE.Vector3(x, 0.15, -innerHalfL), new THREE.Vector3(x, 0.15, innerHalfL), rebarRadius, rebarMaterial));
-                rebarGroup.add(createCylinderBetweenPoints(new THREE.Vector3(x, 0.15, -innerHalfL), new THREE.Vector3(x, 0.15 + hookH, -innerHalfL), rebarRadius, rebarMaterial));
-                rebarGroup.add(createCylinderBetweenPoints(new THREE.Vector3(x, 0.15, innerHalfL), new THREE.Vector3(x, 0.15 + hookH, innerHalfL), rebarRadius, rebarMaterial));
-            }
-
-            // 4. เหล็กรัดรอบฐานราก (พร้อมระยะทาบงอปลาย 0.20 ม.)
-            const tieY = 0.14;
-            const t1 = new THREE.Vector3(-innerHalfW, tieY, -innerHalfL);
-            const t2 = new THREE.Vector3(innerHalfW, tieY, -innerHalfL);
-            const t3 = new THREE.Vector3(innerHalfW, tieY, innerHalfL);
-            const t4 = new THREE.Vector3(-innerHalfW, tieY, innerHalfL);
-            const tOverlap = new THREE.Vector3(-innerHalfW + 0.20, tieY, -innerHalfL);
-
-            rebarGroup.add(createCylinderBetweenPoints(t1, tOverlap, tieRadius, rebarMaterial));
-            rebarGroup.add(createCylinderBetweenPoints(t1, t2, tieRadius, rebarMaterial));
-            rebarGroup.add(createCylinderBetweenPoints(t2, t3, tieRadius, rebarMaterial));
-            rebarGroup.add(createCylinderBetweenPoints(t3, t4, tieRadius, rebarMaterial));
-            rebarGroup.add(createCylinderBetweenPoints(t4, t1, tieRadius, rebarMaterial));
-
-            group.add(rebarGroup);
-
-            // 5. เหล็กเสาตอม่อ 3D พร้อมเหล็กปลอก
-            const colGroup = new THREE.Group();
-            const colRebarRadius = (data.colDb / 2000) * 2.2;
-            const stirrupRadius = (6 / 2000) * 2.2;
-            const colHalf = 0.06;
-            const colTopY = 0.10 + 1.50 + 0.48;
-
+        verticalLength += addRebar(
+            steel,
             [
-                { x: -colHalf, z: -colHalf, dx: -0.15, dz: -0.15 },
-                { x:  colHalf, z: -colHalf, dx:  0.15, dz: -0.15 },
-                { x:  colHalf, z:  colHalf, dx:  0.15, dz:  0.15 },
-                { x: -colHalf, z:  colHalf, dx: -0.15, dz:  0.15 }
-            ].forEach(c => {
-                colGroup.add(createCylinderBetweenPoints(new THREE.Vector3(c.x, 0.16, c.z), new THREE.Vector3(c.x, colTopY, c.z), colRebarRadius, colRebarMaterial));
-                colGroup.add(createCylinderBetweenPoints(new THREE.Vector3(c.x, 0.16, c.z), new THREE.Vector3(c.x + c.dx, 0.16, c.z + c.dz), colRebarRadius, colRebarMaterial));
-            });
+                [x + visualOffset, lapStartY, z],
+                [x + visualOffset, verticalTopY, z]
+            ],
+            item.colDia,
+            lapBarMat
+        );
 
-            for(let y = 0.10 + th + 0.15; y <= colTopY - 0.1; y += 0.15) {
-                colGroup.add(createCylinderBetweenPoints(new THREE.Vector3(-colHalf, y, -colHalf), new THREE.Vector3(colHalf, y, -colHalf), stirrupRadius, colRebarMaterial));
-                colGroup.add(createCylinderBetweenPoints(new THREE.Vector3(colHalf, y, -colHalf), new THREE.Vector3(colHalf, y, colHalf), stirrupRadius, colRebarMaterial));
-                colGroup.add(createCylinderBetweenPoints(new THREE.Vector3(colHalf, y, colHalf), new THREE.Vector3(-colHalf, y, colHalf), stirrupRadius, colRebarMaterial));
-                colGroup.add(createCylinderBetweenPoints(new THREE.Vector3(-colHalf, y, colHalf), new THREE.Vector3(-colHalf, y, -colHalf), stirrupRadius, colRebarMaterial));
-            }
+        totalColumnLapLength += actualLapLength;
+    });
 
-            group.add(colGroup);
-            group.position.set(pos.x, 0, pos.z);
-            scene.add(group);
-            allGroups.push(group);
+    /* เหล็กปลอกตอม่อ วางอยู่รอบเหล็กยืน */
+    const stirrupHalfW = stirrupCenterHalfW;
+    const stirrupHalfL = stirrupCenterHalfL;
+    const stirrupY0 = footingTop + SET.cover + SET.stirrupDia / 2000;
+    const stirrupY1 = pedestalTop - SET.cover - SET.stirrupDia / 2000;
 
-            const specs = calculateEngineeringSpecs(pos.id);
-            grandTotalWeight += specs.weight;
-            grandTotalVolume += specs.volume;
+    const stirrupCount = Math.max(
+        1,
+        Math.floor(pedestalHeight / SET.stirrupSpacing) + 1
+    );
 
-            // บรรจุตาราง BOQ
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><b>Grid ${pos.id}</b></td>
-                <td>${data.name}</td>
-                <td>${data.countX}+${data.countY} ${data.rebarType} + งอ 12db + รัดรอบ</td>
-                <td>${specs.volume.toFixed(3)}</td>
-                <td style="color:#b45309; font-weight:600;">${specs.weight.toFixed(1)}</td>
-            `;
-            boqTbody.appendChild(row);
+    let stirrupLengthTotal = 0;
 
-            const labelDiv = document.createElement('div');
-            labelDiv.className = 'grid-label-3d';
-            labelDiv.innerHTML = `<b>Grid ${pos.id}</b><br><span style="font-size:9px; color:#e6c584;">${data.name}</span>`;
-            const label = new THREE.CSS2DObject(labelDiv);
-            label.position.set(0, 0.10 + 1.50 + 0.60, 0);
-            group.add(label);
-        });
+    for (let i = 0; i < stirrupCount; i++) {
+        const y = stirrupY0 +
+            (stirrupY1 - stirrupY0) * i / Math.max(1, stirrupCount - 1);
 
-        document.getElementById('total-rebar-weight').innerText = `${grandTotalWeight.toFixed(1)} kg`;
-        document.getElementById('total-conc-vol').innerText = `${grandTotalVolume.toFixed(2)} m³`;
+        const stirrupPath = roundedLoop(
+            stirrupHalfW,
+            stirrupHalfL,
+            0.018,
+            y
+        );
 
-        function setSectionMode(mode) {
-            document.getElementById('btn-full').classList.toggle('active', mode === 'full');
-            document.getElementById('btn-section').classList.toggle('active', mode === 'section');
+        stirrupLengthTotal += addRebar(
+            steel,
+            stirrupPath,
+            SET.stirrupDia,
+            lapBarMat,
+            true
+        );
+    }
 
-            allGroups.forEach(group => {
-                group.children.forEach(child => {
-                    if(child.isMesh || child.isGroup || child.isLineSegments) {
-                        child.visible = (mode === 'section') ? (group.position.x <= 0.0) : true;
-                    }
-                });
-            });
-        }
+    steelGroup.add(steel);
 
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-            labelRenderer.render(scene, camera);
-        }
-        animate();
+    // ป้าย Grid
+    const labelDiv = document.createElement("div");
+    labelDiv.className = "grid-label";
+    labelDiv.innerHTML = `${item.id}<small>${item.name}</small>`;
 
-        window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            labelRenderer.setSize(container.clientWidth, container.clientHeight);
-        });
-    </script>
+    const label = new THREE.CSS2DObject(labelDiv);
+    label.position.set(item.x, pedestalTop + 0.2, item.z);
+    labelGroup.add(label);
+
+    // ปริมาณวัสดุ
+    const sandVolume =
+        (leanW + 0.10) * (leanL + 0.10) * SET.sandT;
+
+    const leanVolume =
+        leanW * leanL * SET.leanT;
+
+    const footingVolume =
+        item.w * item.l * item.t;
+
+    const pedestalVolume =
+        SET.pedestalW * SET.pedestalL * pedestalHeight;
+
+    const concreteVolume =
+        footingVolume + pedestalVolume;
+
+    const footingSteelKg =
+        footingBarLength * weightPerMeter(item.dia);
+
+    const tieSteelKg =
+        tieLength * weightPerMeter(SET.tieDia);
+
+    const verticalSteelKg =
+        verticalLength * weightPerMeter(item.colDia);
+
+    const stirrupSteelKg =
+        stirrupLengthTotal * weightPerMeter(SET.stirrupDia);
+
+    const steelKg =
+        footingSteelKg +
+        tieSteelKg +
+        verticalSteelKg +
+        stirrupSteelKg;
+
+    return {
+        sandVolume,
+        leanVolume,
+        concreteVolume,
+        hookLengthTotal,
+        tieLength,
+        columnLapLength: totalColumnLapLength,
+        stirrupCount,
+        steelKg,
+        steelKgWithWaste: steelKg * (1 + SET.waste)
+    };
+}
+
+function fmt(number, digits = 3) {
+    return Number(number).toLocaleString("th-TH", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+    });
+}
+
+/* สร้างโมเดลและ BOQ */
+const tbody = document.getElementById("boqBody");
+const totals = {
+    concrete: 0,
+    lean: 0,
+    sand: 0,
+    hookLength: 0,
+    lapLength: 0,
+    steel: 0,
+    steelWaste: 0
+};
+
+foundations.forEach(item => {
+    const q = addFoundation(item);
+
+    totals.concrete += q.concreteVolume;
+    totals.lean += q.leanVolume;
+    totals.sand += q.sandVolume;
+    totals.hookLength += q.hookLengthTotal;
+    totals.lapLength += q.columnLapLength;
+    totals.steel += q.steelKg;
+    totals.steelWaste += q.steelKgWithWaste;
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td><strong>${item.id}</strong></td>
+        <td>${item.name}</td>
+        <td>${fmt(q.concreteVolume)}</td>
+        <td>${fmt(q.sandVolume)}</td>
+        <td>${fmt(q.hookLengthTotal, 2)}</td>
+        <td>${fmt(q.columnLapLength, 2)}</td>
+        <td>${fmt(q.steelKgWithWaste, 1)}</td>
+    `;
+    tbody.appendChild(row);
+});
+
+const totalRow = document.createElement("tr");
+totalRow.className = "total-row";
+totalRow.innerHTML = `
+    <td colspan="2">รวม ${foundations.length} ฐาน</td>
+    <td>${fmt(totals.concrete)}</td>
+    <td>${fmt(totals.sand)}</td>
+    <td>${fmt(totals.hookLength, 2)}</td>
+    <td>${fmt(totals.lapLength, 2)}</td>
+    <td>${fmt(totals.steelWaste, 1)}</td>
+`;
+tbody.appendChild(totalRow);
+
+document.getElementById("sumCount").textContent =
+    `${foundations.length} ฐาน`;
+document.getElementById("sumConcrete").textContent =
+    `${fmt(totals.concrete)} m³`;
+document.getElementById("sumLean").textContent =
+    `${fmt(totals.lean)} m³`;
+document.getElementById("sumSand").textContent =
+    `${fmt(totals.sand)} m³`;
+document.getElementById("sumSteel").textContent =
+    `${fmt(totals.steel, 1)} kg`;
+document.getElementById("sumSteelWaste").textContent =
+    `${fmt(totals.steelWaste, 1)} kg`;
+
+function setCamera(mode) {
+    if (mode === "top") {
+        camera.position.set(0, 20, 0.01);
+    } else {
+        camera.position.set(13, 13, 16);
+    }
+
+    controls.target.set(0, 0.65, 0);
+    controls.update();
+}
+
+document.getElementById("toggleConcrete").addEventListener("click", event => {
+    concreteVisible = !concreteVisible;
+    concreteGroup.visible = concreteVisible;
+    event.currentTarget.textContent =
+        concreteVisible ? "ซ่อนคอนกรีต" : "แสดงคอนกรีต";
+    event.currentTarget.classList.toggle("active", concreteVisible);
+});
+
+document.getElementById("toggleLayers").addEventListener("click", event => {
+    layersVisible = !layersVisible;
+    layerGroup.visible = layersVisible;
+    event.currentTarget.textContent =
+        layersVisible ? "ซ่อนชั้นวัสดุ" : "แสดงชั้นวัสดุ";
+    event.currentTarget.classList.toggle("active", layersVisible);
+});
+
+document.getElementById("showLabels").addEventListener("change", event => {
+    labelGroup.visible = event.target.checked;
+});
+
+document.getElementById("resetCamera").addEventListener("click", () => setCamera("iso"));
+document.getElementById("topView").addEventListener("click", () => setCamera("top"));
+document.getElementById("isoView").addEventListener("click", () => setCamera("iso"));
+
+function resizeRenderer() {
+    const width = Math.max(viewer.clientWidth, 1);
+    const height = Math.max(viewer.clientHeight, 1);
+
+    renderer.setSize(width, height);
+    labelRenderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+}
+
+window.addEventListener("resize", resizeRenderer);
+resizeRenderer();
+
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+}
+animate();
+</script>
 </body>
 </html>
