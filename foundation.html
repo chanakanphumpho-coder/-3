@@ -1,729 +1,970 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ถอดแบบฐานราก 14 ตำแหน่ง | 3D</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบ 3D ถอดแบบและแสดงผลเหล็กเสริมฐานราก (Foundation Rebar BIM Visualizer & BOQ)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js & Controls via cdnjs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-<style>
-:root {
-    --navy:#17283a; --gold:#c5a059; --gold-light:#ead6a8;
-    --page:#f1f4f6; --text:#263445; --muted:#68798a; --border:#dce3e9;
-}
-* { box-sizing:border-box; margin:0; padding:0; font-family:"Prompt",sans-serif; }
-body {
-    min-height:100vh; color:var(--text);
-    background:
-        radial-gradient(ellipse at 10% 0%,rgba(142,181,207,.15),transparent 35%),
-        radial-gradient(ellipse at 90% 0%,rgba(197,160,89,.12),transparent 30%),
-        var(--page);
-}
-header { color:white; padding:16px 22px; background:linear-gradient(120deg,#747a80,#555b61); border-bottom:2px solid var(--gold); }
-.header-inner { max-width:1600px; margin:auto; display:flex; align-items:center; justify-content:space-between; gap:14px; }
-h1 { font-size:clamp(1rem,2vw,1.4rem); font-weight:600; }
-.subtitle { color:#e0e3e5; font-size:.78rem; margin-top:3px; }
-.back-link { color:white; text-decoration:none; white-space:nowrap; border:1px solid #ffffff4d; border-radius:30px; padding:7px 13px; }
-.back-link:hover { color:var(--navy); background:var(--gold-light); }
-main { max-width:1600px; margin:18px auto; padding:0 16px; }
-.layout { display:grid; grid-template-columns:minmax(0,1fr) 470px; gap:16px; align-items:start; }
-.card { background:white; border:1px solid var(--border); border-radius:15px; box-shadow:0 12px 32px #192a3c14; overflow:hidden; }
-.viewer-heading { padding:12px 15px; display:flex; justify-content:space-between; gap:10px; border-bottom:1px solid var(--border); }
-.viewer-heading strong { font-size:.92rem; }
-.viewer-heading span { color:var(--muted); font-size:.72rem; }
-#viewer { position:relative; height:min(76vh,800px); min-height:510px; background:#808080; }
-#viewer canvas { display:block; }
-.viewer-tip {
-    position:absolute; z-index:2; top:11px; left:11px; max-width:calc(100% - 22px);
-    color:#edf2f6; background:#08121dde; border:1px solid #c5a05999;
-    border-radius:8px; padding:7px 10px; font-size:.72rem; pointer-events:none;
-}
-.toolbar { position:absolute; z-index:2; left:11px; bottom:11px; display:flex; flex-wrap:wrap; gap:7px; }
-.toolbar button,.controls button {
-    cursor:pointer; border:1px solid #c5a059a6; border-radius:7px; padding:7px 10px; font-size:.72rem;
-}
-.toolbar button { color:#eef2f5; background:#08121deB; }
-.toolbar button:hover,.toolbar button.active { color:#172536; background:var(--gold-light); }
-.panel { padding:15px; }
-.panel h2 { font-size:1rem; margin-bottom:4px; }
-.panel-intro { color:var(--muted); font-size:.72rem; margin-bottom:12px; }
-.controls { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:10px; }
-.controls button { color:var(--navy); background:#f6f8fa; border-color:var(--border); }
-.controls button:hover { background:#e9f1f6; }
-.checkline { display:flex; align-items:center; gap:7px; color:#526273; font-size:.74rem; margin:7px 0 12px; }
-.checkline input { accent-color:var(--gold); }
-.table-wrap { max-height:430px; overflow:auto; border:1px solid var(--border); border-radius:8px; }
-table { width:100%; border-collapse:collapse; font-size:.67rem; white-space:nowrap; }
-th { position:sticky; top:0; z-index:1; color:white; background:var(--navy); text-align:left; padding:8px 7px; }
-td { padding:7px; border-bottom:1px solid #e8edf1; vertical-align:top; }
-tbody tr:hover { background:#f1f7fa; }
-tr.total-row { font-weight:700; background:#f8f5ed; }
-.summary { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
-.summary-item { padding:9px; background:#f7f9fb; border:1px solid var(--border); border-radius:8px; }
-.summary-item span { display:block; color:var(--muted); font-size:.66rem; }
-.summary-item strong { display:block; margin-top:3px; color:#20364b; font-size:.86rem; }
-.notice { margin-top:12px; padding:10px; color:#68552f; background:#fff9eb; border:1px solid #ead8b4; border-radius:8px; font-size:.7rem; line-height:1.6; }
-.grid-label { padding:3px 6px; color:white; background:#08121de6; border:1px solid var(--gold); border-radius:5px; text-align:center; font-size:10px; white-space:nowrap; pointer-events:none; }
-.grid-label small { display:block; color:var(--gold-light); font-size:8px; }
-.error-message { display:none; position:absolute; z-index:5; top:60px; left:12px; right:12px; padding:12px; color:#8a1f1f; background:#fff0f0; border:1px solid #e5bcbc; border-radius:8px; font-size:.85rem; }
-footer { padding:14px; color:#c4ced8; background:var(--navy); text-align:center; font-size:.74rem; }
-@media(max-width:1100px) { .layout { grid-template-columns:1fr; } #viewer { height:62vh; } }
-@media(max-width:600px) {
-    .header-inner { align-items:flex-start; flex-direction:column; }
-    main { padding:0 9px; }
-    #viewer { min-height:440px; height:56vh; }
-    .viewer-heading { flex-direction:column; }
-    .panel { padding:11px; }
-}
-</style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Prompt', sans-serif; overflow: hidden; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
 </head>
+<body class="bg-slate-950 text-slate-100 h-screen flex flex-col">
 
-<body>
-<header>
-    <div class="header-inner">
-        <div>
-            <h1>ถอดแบบโครงสร้างใต้ดิน — ฐานราก 14 ตำแหน่ง</h1>
-            <div class="subtitle">โมเดล 3D • ทรายหยาบ • คอนกรีตหยาบ • ฐานราก • ตอม่อ • เหล็กเสริม</div>
+    <!-- Top Header -->
+    <header class="bg-slate-900 border-b border-slate-800 px-6 py-2.5 flex justify-between items-center shadow-lg z-25 shrink-0">
+        <div class="flex items-center space-x-3">
+            <div class="bg-gradient-to-tr from-sky-600 to-amber-500 p-2 rounded-xl text-white shadow-md">
+                <i class="fa-solid fa-cube text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base leading-tight text-white flex items-center gap-2">
+                    ระบบ 3D BIM ถอดแบบและแสดงผลเหล็กเสริมโครงสร้างฐานราก
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-normal">
+                        <i class="fa-solid fa-check-double text-[9px] mr-1"></i>Foundation & Stub Column Standard
+                    </span>
+                </h1>
+                <p class="text-xs text-slate-400">เฉพาะงานฐานราก 14 ตำแหน่ง, เสาตอม่อ, เหล็กตะแกรง, เหล็กรัดรอบ และเหล็กเดือยเสา</p>
+            </div>
         </div>
-        <a class="back-link" href="index.html">← กลับหน้าหลัก</a>
-    </div>
-</header>
+        <div class="flex items-center space-x-3">
+            <button onclick="exportToCSV()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 font-medium shadow">
+                <i class="fa-solid fa-file-csv"></i> Export BOQ CSV
+            </button>
+            <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 font-medium">
+                <i class="fa-solid fa-print"></i> พิมพ์รายงาน
+            </button>
+        </div>
+    </header>
 
-<main>
-    <div class="layout">
-        <section class="card">
-            <div class="viewer-heading">
-                <strong>โมเดลแปลนฐานรากและเหล็กเสริม</strong>
-                <span>ลากเพื่อหมุน • เลื่อนเพื่อซูม</span>
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <!-- Left Controls / Price Config Panel -->
+        <aside id="sidebar" class="w-80 bg-slate-900/90 border-r border-slate-800 flex flex-col shrink-0 z-10 text-xs">
+            <div class="p-3 border-b border-slate-800 bg-slate-900 flex justify-between items-center">
+                <span class="font-semibold text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-sky-400"></i> ควบคุมการแสดงผล & ราคา
+                </span>
+                <button onclick="resetAllDefaults()" class="text-[11px] text-sky-400 hover:underline">รีเซ็ต</button>
             </div>
-            <div id="viewer">
-                <div class="viewer-tip">กด “ซ่อนคอนกรีต” เพื่อดูเหล็ก • หมุนและซูมเพื่อดูแต่ละ Grid</div>
-                <div class="error-message" id="errorMessage"></div>
-                <div class="toolbar">
-                    <button id="toggleConcrete" class="active" type="button">ซ่อนคอนกรีต</button>
-                    <button id="toggleLayers" class="active" type="button">ซ่อนชั้นวัสดุ</button>
-                    <button id="resetCamera" type="button">มุมมองทั้งหมด</button>
+
+            <div class="p-4 overflow-y-auto flex-1 space-y-4">
+                
+                <!-- 3D Layer Controls -->
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-3">
+                    <div class="font-semibold text-slate-200 flex items-center justify-between border-b border-slate-700/60 pb-1.5">
+                        <span class="flex items-center gap-1.5 text-sky-400"><i class="fa-solid fa-layer-group"></i> ควบคุม Layer 3D & วัสดุ</span>
+                    </div>
+
+                    <!-- Material Render Mode -->
+                    <div>
+                        <label class="block text-slate-300 text-[11px] mb-1">โหมดสีผิวเหล็ก (Rebar Material Mode)</label>
+                        <select id="rebar-material-mode" onchange="toggleRebarMaterialMode(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-slate-200 text-xs focus:border-sky-500 outline-none">
+                            <option value="color">แยกสีตามประเภทเหล็ก (Color Coded)</option>
+                            <option value="metallic">เนื้อเหล็กจริงสมจริง (Realistic Metallic Steel)</option>
+                        </select>
+                    </div>
+
+                    <!-- Concrete Visibility Slider -->
+                    <div>
+                        <div class="flex justify-between text-[11px] mb-1">
+                            <span class="text-slate-300">ความโปร่งแสงคอนกรีต</span>
+                            <span id="opacity-val" class="text-sky-400 font-mono">35%</span>
+                        </div>
+                        <input type="range" id="concrete-opacity" min="0" max="100" value="35" oninput="updateConcreteOpacity(this.value)" class="w-full accent-sky-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Layer Toggles -->
+                    <div class="space-y-2 pt-1">
+                        <label class="flex items-center justify-between p-2 rounded-lg bg-slate-800 hover:bg-slate-750 cursor-pointer border border-slate-700/50">
+                            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-bone text-orange-500"></i> เหล็กเสริมฐานราก & ตอม่อ</span>
+                            <input type="checkbox" id="toggle-rebars" checked onchange="toggleLayer('rebars', this.checked)" class="accent-orange-500 w-4 h-4 rounded">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded-lg bg-slate-800 hover:bg-slate-750 cursor-pointer border border-slate-700/50">
+                            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-square-minus text-pink-500"></i> เหล็กรัดรอบฐานราก (Perimeter Ties)</span>
+                            <input type="checkbox" id="toggle-perim-ties" checked onchange="toggleLayer('perimTies', this.checked)" class="accent-pink-500 w-4 h-4 rounded">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded-lg bg-slate-800 hover:bg-slate-750 cursor-pointer border border-slate-700/50">
+                            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-cube text-sky-400"></i> เนื้อคอนกรีตฐานราก & ตอม่อ</span>
+                            <input type="checkbox" id="toggle-concrete" checked onchange="toggleLayer('concrete', this.checked)" class="accent-sky-500 w-4 h-4 rounded">
+                        </label>
+                        <label class="flex items-center justify-between p-2 rounded-lg bg-slate-800 hover:bg-slate-750 cursor-pointer border border-slate-700/50">
+                            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-border-top-left text-slate-400"></i> ผัง Grid Line & Axis</span>
+                            <input type="checkbox" id="toggle-grid" checked onchange="toggleLayer('grid', this.checked)" class="accent-slate-400 w-4 h-4 rounded">
+                        </label>
+                    </div>
                 </div>
-            </div>
-        </section>
 
-        <aside class="card panel">
-            <h2>รายการถอดแบบเบื้องต้น</h2>
-            <div class="panel-intro">แสดงปริมาณแยกตาม Grid พร้อมชนิด ขนาดเหล็ก ระยะงอ และระยะทาบ</div>
-            <div class="controls">
-                <button id="topView" type="button">มุมมองด้านบน</button>
-                <button id="isoView" type="button">มุมมอง 3D</button>
-            </div>
-            <label class="checkline">
-                <input id="showLabels" type="checkbox" checked>
-                แสดงชื่อ Grid บนโมเดล
-            </label>
+                <!-- Unit Cost Config -->
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-2.5">
+                    <div class="font-semibold text-slate-200 flex items-center justify-between border-b border-slate-700/60 pb-1.5">
+                        <span class="flex items-center gap-1.5 text-amber-400"><i class="fa-solid fa-coins"></i> ราคาต่อหน่วยวัสดุ</span>
+                        <span class="text-[10px] text-slate-400">บาท/หน่วย</span>
+                    </div>
 
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Grid</th><th>ฐานราก</th><th>คอนกรีต (m³)</th>
-                            <th>ทราย (m³)</th><th>รายละเอียดเหล็ก</th>
-                            <th>งอ (ม.)</th><th>ทาบ (ม.)</th><th>เหล็ก (kg)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="boqBody"></tbody>
-                </table>
-            </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">เหล็กข้ออ้อย DB12, DB16 (กก.)</label>
+                        <input type="number" id="price-steel-db" value="32" onchange="calculateBOQ()" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-slate-100 font-semibold focus:border-sky-500 outline-none font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">เหล็กเส้นกลม RB6, RB9 (กก.)</label>
+                        <input type="number" id="price-steel-rb" value="30" onchange="calculateBOQ()" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-slate-100 font-semibold focus:border-sky-500 outline-none font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">คอนกรีตโครงสร้าง 240 ksc (ลบ.ม.)</label>
+                        <input type="number" id="price-conc" value="2400" onchange="calculateBOQ()" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-slate-100 font-semibold focus:border-sky-500 outline-none font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">ไม้แบบหล่อคอนกรีต (ตร.ม.)</label>
+                        <input type="number" id="price-formwork" value="350" onchange="calculateBOQ()" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-slate-100 font-semibold focus:border-sky-500 outline-none font-mono">
+                    </div>
+                </div>
 
-            <div class="summary">
-                <div class="summary-item"><span>จำนวนฐานราก</span><strong id="sumCount">-</strong></div>
-                <div class="summary-item"><span>คอนกรีตฐาน+ตอม่อ</span><strong id="sumConcrete">-</strong></div>
-                <div class="summary-item"><span>คอนกรีตหยาบ</span><strong id="sumLean">-</strong></div>
-                <div class="summary-item"><span>ทรายหยาบ</span><strong id="sumSand">-</strong></div>
-                <div class="summary-item"><span>เหล็กก่อนเผื่อ</span><strong id="sumSteel">-</strong></div>
-                <div class="summary-item"><span>เหล็กหลังเผื่อ</span><strong id="sumSteelWaste">-</strong></div>
-            </div>
+                <!-- Structural Parameters -->
+                <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 space-y-2.5">
+                    <div class="font-semibold text-slate-200 border-b border-slate-700/60 pb-1.5 flex items-center gap-1.5 text-emerald-400">
+                        <i class="fa-solid fa-ruler"></i> พารามิเตอร์เสาตอม่อ
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1">ความสูงเสาตอม่อ H (ม.)</label>
+                        <input type="number" step="0.1" id="param-stub-height" value="1.5" onchange="onParameterChange()" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1 text-slate-100 font-semibold focus:border-sky-500 outline-none font-mono">
+                    </div>
+                </div>
 
-            <div class="notice">
-                <strong>หมายเหตุ:</strong> ระยะหุ้มและระยะงอ/ทาบปรับปรุงตามหลักวิศวกรรม (เหล็กตะแกรงงอขึ้นแตะระดับเหล็กรัดฐาน และเหล็กยืนฝังลึกผูกฝาก) โปรดตรวจสอบกับแบบขยายจริงอีกครั้ง
             </div>
         </aside>
+
+        <!-- Right 3D Viewport & BOQ Panel -->
+        <main class="flex-1 flex flex-col overflow-hidden relative bg-slate-950">
+
+            <!-- View Switcher & Quick Summary Header -->
+            <div class="bg-slate-900 border-b border-slate-800 px-6 py-2 flex justify-between items-center shrink-0 z-10">
+                <div class="flex space-x-2">
+                    <button id="tab-btn-3d" onclick="switchTab('3d')" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow flex items-center gap-2">
+                        <i class="fa-solid fa-cube"></i> แบบจำลอง 3D Rebar View
+                    </button>
+                    <button id="tab-btn-boq" onclick="switchTab('boq')" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 border border-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-table-list"></i> ตาราง BOQ & สรุปราคาฐานราก
+                    </button>
+                </div>
+                <!-- Realtime Top Summary -->
+                <div class="flex items-center space-x-6 text-xs">
+                    <div>
+                        <span class="text-slate-400 block text-[10px]">น้ำหนักเหล็กฐานราก+ตอม่อ</span>
+                        <span id="summary-steel-weight" class="font-bold text-amber-400 font-mono text-sm">0.00 kg</span>
+                    </div>
+                    <div class="border-r border-slate-800 h-6"></div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px]">คอนกรีตรวม (ผัด 5%)</span>
+                        <span id="summary-conc-vol" class="font-bold text-sky-400 font-mono text-sm">0.00 m³</span>
+                    </div>
+                    <div class="border-r border-slate-800 h-6"></div>
+                    <div>
+                        <span class="text-slate-400 block text-[10px]">งบประมาณฐานรากสุทธิ</span>
+                        <span id="summary-total-cost" class="font-extrabold text-emerald-400 font-mono text-sm">฿0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D Canvas Container -->
+            <div id="view-3d" class="absolute inset-0 top-[49px] w-full h-[calc(100%-49px)]">
+                <canvas id="three-canvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+
+                <!-- Legend Box -->
+                <div class="absolute top-4 left-4 glass-panel p-3.5 rounded-xl shadow-2xl text-xs max-w-xs space-y-2 pointer-events-none">
+                    <div class="font-bold text-slate-100 flex items-center gap-2 border-b border-slate-700/50 pb-1.5">
+                        <i class="fa-solid fa-shield-halved text-emerald-400"></i> มาตรฐานดัดงอเหล็กฐานราก (Details)
+                    </div>
+                    <div class="space-y-1.5 text-[11px] text-slate-300">
+                        <div class="flex items-center justify-between"><span class="text-amber-400 font-semibold">เหล็กปลอกเสา:</span> <span>งอขอ 135° Seismic Hook</span></div>
+                        <div class="flex items-center justify-between"><span class="text-orange-400 font-semibold">เหล็กเดือยเสา:</span> <span>งอฉากเท้าเป็ด 90° L-Splice</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sky-400 font-semibold">เหล็กฐานราก:</span> <span>งอดัดขึ้นฉาก 90° (12d_b)</span></div>
+                        <div class="flex items-center justify-between"><span class="text-pink-400 font-semibold">เหล็กรัดรอบ:</span> <span>เหล็กรัดขอบฐานราก RB9</span></div>
+                    </div>
+                </div>
+
+                <!-- Hover/Click Inspection Card -->
+                <div id="info-card" class="hidden absolute bottom-6 left-6 glass-panel p-4 rounded-xl shadow-2xl border border-sky-500/40 text-xs w-80 transition-all z-20">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span id="card-tag" class="bg-orange-600 text-white font-bold text-[10px] px-2 py-0.5 rounded">F1.30x1.30</span>
+                            <h3 id="card-grid" class="font-bold text-white text-sm mt-1">Grid Position: D1</h3>
+                        </div>
+                        <button onclick="hideInfoCard()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
+                    </div>
+                    <div id="card-details-body" class="space-y-1.5 text-slate-300 border-t border-slate-700/60 pt-2.5">
+                        <!-- Dynamic details -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOQ Summary Table View -->
+            <div id="view-boq" class="hidden absolute inset-0 top-[49px] w-full h-[calc(100%-49px)] bg-slate-950 p-6 overflow-y-auto">
+                <div class="max-w-6xl mx-auto space-y-6">
+
+                    <!-- Header Banner -->
+                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i> ใบถอดแบบและประเมินราคาเหล็กเสริม & คอนกรีตฐานราก (BOQ)
+                            </h2>
+                            <p class="text-xs text-slate-400 mt-1">เฉพาะหมวดงานฐานราก 14 ตำแหน่ง และเสาตอม่อ คำนวณจากความยาวเหล็กจริง + ระยะงอขอฉาก + เหล็กรัดรอบ + เผื่อสูญเสีย</p>
+                        </div>
+                        <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex gap-6 text-center">
+                            <div>
+                                <div class="text-[10px] text-slate-400">เหล็กฐานรากรวม (Kg)</div>
+                                <div id="boq-header-steel" class="text-sm font-bold text-amber-400 font-mono">0.00 kg</div>
+                            </div>
+                            <div class="border-r border-slate-800"></div>
+                            <div>
+                                <div class="text-[10px] text-slate-400">คอนกรีตรวม (m³)</div>
+                                <div id="boq-header-conc" class="text-sm font-bold text-sky-400 font-mono">0.00 m³</div>
+                            </div>
+                            <div class="border-r border-slate-800"></div>
+                            <div>
+                                <div class="text-[10px] text-slate-400">ยอดรวมสุทธิฐานราก</div>
+                                <div id="boq-header-total" class="text-base font-extrabold text-emerald-400 font-mono">฿0.00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main BOQ Table -->
+                    <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
+                        <div class="px-6 py-3.5 border-b border-slate-800 flex justify-between items-center bg-slate-900/60">
+                            <h3 class="font-bold text-slate-200 text-xs flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-sky-400"></i> สรุปรายการวัสดุและประมาณการค่าใช้จ่าย (เฉพาะฐานราก & ตอม่อ)
+                            </h3>
+                            <span class="text-[11px] text-slate-400">สกุลเงิน: บาท (THB)</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-800/80 text-slate-300 border-b border-slate-700 font-semibold text-[11px]">
+                                        <th class="py-3 px-4 w-12 text-center">ลำดับ</th>
+                                        <th class="py-3 px-4">รายการวัสดุ / หมวดงานฐานราก</th>
+                                        <th class="py-3 px-4 text-center">ปริมาณคำนวณ</th>
+                                        <th class="py-3 px-4 text-center">หน่วย</th>
+                                        <th class="py-3 px-4 text-right">ราคา/หน่วย (บาท)</th>
+                                        <th class="py-3 px-4 text-right">จำนวนเงิน (บาท)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="boq-table-body" class="divide-y divide-slate-800 text-slate-300 font-mono">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-slate-800/90 font-bold text-slate-100 border-t-2 border-slate-700">
+                                        <td colspan="5" class="py-4 px-4 text-right font-sans">รวมงบประมาณฐานรากและเสาตอม่อสุทธิ:</td>
+                                        <td id="boq-grand-total" class="py-4 px-4 text-right text-emerald-400 font-extrabold text-base font-mono">฿0.00</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Rebar Breakdown Table -->
+                    <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 space-y-4">
+                        <h3 class="font-bold text-slate-200 text-xs flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-amber-400"></i> ตารางรายละเอียดถอดแบบเหล็กเสริมแยกรายประเภทฐานราก (Detailed Rebar Schedule)
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-center border border-slate-800">
+                                <thead class="bg-slate-800 text-slate-300 font-semibold text-[11px]">
+                                    <tr>
+                                        <th class="p-2.5 border border-slate-700">ฐานราก</th>
+                                        <th class="p-2.5 border border-slate-700">ขนาด BxLxH (ม.)</th>
+                                        <th class="p-2.5 border border-slate-700">จำนวน</th>
+                                        <th class="p-2.5 border border-slate-700">เหล็กตะแกรงฐานราก</th>
+                                        <th class="p-2.5 border border-slate-700">เหล็กรัดรอบ (Side Tie)</th>
+                                        <th class="p-2.5 border border-slate-700">เหล็กแกนเสา (Dowels)</th>
+                                        <th class="p-2.5 border border-slate-700">เหล็กปลอกเสา (RB9)</th>
+                                        <th class="p-2.5 border border-slate-700">น้ำหนักเหล็ก/ฐาน (กก.)</th>
+                                        <th class="p-2.5 border border-slate-700">น้ำหนักเหล็กเขตรวม (กก.)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rebar-breakdown-body" class="divide-y divide-slate-800 font-mono text-slate-300">
+                                    <!-- Dynamic breakdown -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
     </div>
-</main>
 
-<footer>Structural Estimation System • โมเดลและรายการปริมาณเพื่อการตรวจสอบเบื้องต้น</footer>
+    <script>
+        // --- 1. DATA DEFINITION (Foundations Only) ---
+        const gridX = { '1': -3.25, '2': 0.25, '3': 3.25 };
+        const gridZ = { 'A': 5.35, 'B': 3.85, 'C': -0.15, 'D': -2.35, 'E': -5.35 };
 
-<script>
-"use strict";
+        const REBAR_WEIGHT = {
+            'RB6': 0.222,
+            'RB9': 0.499,
+            'DB12': 0.888,
+            'DB16': 1.578
+        };
 
-if (!window.THREE || !THREE.OrbitControls || !THREE.CSS2DRenderer) {
-    const error = document.getElementById("errorMessage");
-    error.style.display = "block";
-    error.textContent = "โหลด Three.js ไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ต แล้วเปิดไฟล์ผ่าน Live Server หรือ GitHub Pages";
-    throw new Error("Three.js หรือส่วนเสริมโหลดไม่สำเร็จ");
-}
+        const footingTypes = {
+            'F0.60x0.60': { b: 0.60, l: 0.60, h: 0.20, meshSpec: '4+4 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15' },
+            'F0.90x0.90': { b: 0.90, l: 0.90, h: 0.20, meshSpec: '5+5 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15' },
+            'F1.00x1.00': { b: 1.00, l: 1.00, h: 0.20, meshSpec: '5+5 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15' },
+            'F1.30x1.30': { b: 1.30, l: 1.30, h: 0.25, meshSpec: '7+7 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15' },
+            'F1.40x1.40': { b: 1.40, l: 1.40, h: 0.25, meshSpec: '6+6 DB16', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB16', tieSpec: 'RB9@0.15' },
+            'F1.50x1.50': { b: 1.50, l: 1.50, h: 0.30, meshSpec: '7+7 DB16', perimTie: '1-RB9 รัดรอบ', mainBar: '6-DB16', tieSpec: 'RB9@0.15' }
+        };
 
-const foundations = [
-    {id:"A1",x:-3.5,z:5.35,name:"F0.60×0.60",w:.60,l:.60,t:.20,dia:9,nx:4,ny:4,colDia:12},
-    {id:"A2",x:0,z:5.35,name:"F0.60×0.60",w:.60,l:.60,t:.20,dia:9,nx:4,ny:4,colDia:12},
-    {id:"B1",x:-3.5,z:3.85,name:"F1.30×1.30",w:1.30,l:1.30,t:.25,dia:12,nx:7,ny:7,colDia:12},
-    {id:"B2",x:0,z:3.85,name:"F1.30×1.30",w:1.30,l:1.30,t:.25,dia:12,nx:7,ny:7,colDia:12},
-    {id:"B3",x:3,z:3.85,name:"F0.90×0.90",w:.90,l:.90,t:.20,dia:9,nx:4,ny:4,colDia:12},
-    {id:"C1",x:-3.5,z:-.15,name:"F1.30×1.30",w:1.30,l:1.30,t:.25,dia:12,nx:7,ny:7,colDia:12},
-    {id:"C2",x:0,z:-.15,name:"F1.50×1.50",w:1.50,l:1.50,t:.30,dia:12,nx:7,ny:7,colDia:12},
-    {id:"C3",x:3,z:-.15,name:"F1.30×1.30",w:1.30,l:1.30,t:.25,dia:12,nx:7,ny:7,colDia:12},
-    {id:"D1",x:-3.5,z:-2.35,name:"F1.30×1.30",w:1.30,l:1.30,t:.25,dia:12,nx:7,ny:7,colDia:12},
-    {id:"D2",x:0,z:-2.35,name:"F1.40×1.40",w:1.40,l:1.40,t:.25,dia:16,nx:6,ny:6,colDia:16},
-    {id:"D3",x:3,z:-2.35,name:"F1.30×1.30",w:1.30,l:1.30,t:.25,dia:12,nx:7,ny:7,colDia:12},
-    {id:"E1",x:-3.5,z:-5.35,name:"F0.90×0.90",w:.90,l:.90,t:.20,dia:9,nx:4,ny:4,colDia:12},
-    {id:"E2",x:0,z:-5.35,name:"F1.00×1.00",w:1,l:1,t:.20,dia:12,nx:5,ny:5,colDia:12},
-    {id:"E3",x:3,z:-5.35,name:"F0.90×0.90",w:.90,l:.90,t:.20,dia:9,nx:4,ny:4,colDia:12}
-];
+        const foundationData = [
+            { grid: 'E1', type: 'F0.90x0.90', col: 'C1A', xName: '1', zName: 'E' },
+            { grid: 'E2', type: 'F1.00x1.00', col: 'C1A', xName: '2', zName: 'E' },
+            { grid: 'E3', type: 'F0.90x0.90', col: 'C1A', xName: '3', zName: 'E' },
+            { grid: 'D1', type: 'F1.30x1.30', col: 'C1',  xName: '1', zName: 'D' },
+            { grid: 'D2', type: 'F1.40x1.40', col: 'C1',  xName: '2', zName: 'D' },
+            { grid: 'D3', type: 'F1.30x1.30', col: 'C1',  xName: '3', zName: 'D' },
+            { grid: 'C1', type: 'F1.30x1.30', col: 'C1',  xName: '1', zName: 'C' },
+            { grid: 'C2', type: 'F1.50x1.50', col: 'C1',  xName: '2', zName: 'C' },
+            { grid: 'C3', type: 'F1.30x1.30', col: 'C1',  xName: '3', zName: 'C' },
+            { grid: 'B1', type: 'F1.30x1.30', col: 'C1',  xName: '1', zName: 'B' },
+            { grid: 'B2', type: 'F1.30x1.30', col: 'C1',  xName: '2', zName: 'B' },
+            { grid: 'B3', type: 'F0.90x0.90', col: 'C1',  xName: '3', zName: 'B' },
+            { grid: 'A1', type: 'F0.60x0.60', col: 'C1',  xName: '1', zName: 'A' },
+            { grid: 'A2', type: 'F0.60x0.60', col: 'C1',  xName: '2', zName: 'A' }
+        ];
 
-const SET = {
-    cover:.05,
-    pedestalCover:.025,
-    pedestalW:.20,
-    pedestalL:.20,
-    totalHeightFromFootingBottom:1.50,
-    sandT:.10,
-    leanT:.10,
-    leanOver:.05,
-    tieDia:9,
-    tieTail:.20,
-    tieCornerRadius:.035,
-    hookFactor:18, // ปรับเพิ่มระยะงอปลายเหล็กตะแกรงให้สูงขึ้นไปแตะระดับเหล็กรัดฐาน
-    columnLapFactor:40,
-    columnAnchorFactor:16, // ปรับเพิ่มระยะฝังยึดเหล็กยืนตอม่อลงฐานรากให้ยาวขึ้นตามหลักผูกฝาก
-    spliceVisualOffset:.012,
-    stirrupDia:6,
-    stirrupSpacing:.15,
-    stirrupHookTail:.075,
-    waste:.07
-};
+        // Global Scene Variables
+        let scene, camera, renderer, controls;
+        let interactiveObjects = [];
+        let rebarGroup = new THREE.Group();
+        let perimTieGroup = new THREE.Group();
+        let concreteGroup = new THREE.Group();
+        let gridGroup = new THREE.Group();
+        let raycaster, mouse;
+        let stubHeight = 1.5;
+        let concreteOpacity = 0.35;
+        let isMetallicMode = false;
 
-const BAR_KIND = {footing:"DB",column:"DB",stirrup:"RB",tie:"RB"};
-const weightPerMeter = d => d*d/162;
-const fmt = (n,digits=3) => Number(n).toLocaleString("th-TH",{
-    minimumFractionDigits:digits, maximumFractionDigits:digits
-});
+        // Materials
+        let concreteMat, mainRebarMat, tieRebarMat, meshRebarMat, perimTieMat, metallicRebarMat;
 
-const viewer = document.getElementById("viewer");
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x808080);
+        window.onload = function() {
+            init3DScene();
+            buildFoundationModel();
+            calculateBOQ();
+            animate();
+        };
 
-const camera = new THREE.PerspectiveCamera(42,1,.1,200);
-camera.position.set(13,13,16);
+        // --- 2. THREE.JS SCENE INITIALIZATION ---
+        function init3DScene() {
+            const container = document.getElementById('view-3d');
+            const canvas = document.getElementById('three-canvas');
 
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.outputEncoding = THREE.sRGBEncoding;
-viewer.appendChild(renderer.domElement);
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x090d16);
 
-const labelRenderer = new THREE.CSS2DRenderer();
-labelRenderer.domElement.style.position = "absolute";
-labelRenderer.domElement.style.inset = "0";
-labelRenderer.domElement.style.pointerEvents = "none";
-viewer.appendChild(labelRenderer.domElement);
+            const width = container.clientWidth || window.innerWidth;
+            const height = container.clientHeight || (window.innerHeight - 100);
 
-const controls = new THREE.OrbitControls(camera,renderer.domElement);
-controls.enableDamping = true;
-controls.target.set(0,.7,0);
-controls.maxPolarAngle = Math.PI*.49;
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(12, 12, 16);
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x46515e,1.35));
-const keyLight = new THREE.DirectionalLight(0xfff0d8,1.8);
-keyLight.position.set(8,18,10);
-keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(2048,2048);
-scene.add(keyLight);
-const fillLight = new THREE.DirectionalLight(0x9bc9e8,.65);
-fillLight.position.set(-10,8,-7);
-scene.add(fillLight);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
 
-const world = new THREE.Group();
-scene.add(world);
-const concreteGroup = new THREE.Group();
-const steelGroup = new THREE.Group();
-const layerGroup = new THREE.Group();
-const labelGroup = new THREE.Group();
-world.add(layerGroup,concreteGroup,steelGroup,labelGroup);
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
 
-const concreteMat = new THREE.MeshStandardMaterial({
-    color:0xbcc5cc,roughness:.86,transparent:true,opacity:.48
-});
-const leanMat = new THREE.MeshStandardMaterial({color:0x77838e,roughness:.96});
-const sandMat = new THREE.MeshStandardMaterial({color:0xb79a6b,roughness:1});
-const footingBarMat = new THREE.MeshStandardMaterial({color:0xc58d34,roughness:.32,metalness:.72});
-const verticalBarMat = new THREE.MeshStandardMaterial({color:0x53afd4,roughness:.3,metalness:.65});
-const lapBarMat = new THREE.MeshStandardMaterial({color:0xe7b14e,roughness:.3,metalness:.7});
+            // Lights
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const sunLight = new THREE.DirectionalLight(0xffffff, 1.0);
+            sunLight.position.set(25, 45, 25);
+            scene.add(sunLight);
 
-let concreteVisible = true;
-let layersVisible = true;
+            // Add Groups
+            scene.add(concreteGroup);
+            scene.add(rebarGroup);
+            scene.add(perimTieGroup);
+            scene.add(gridGroup);
 
-function addBox(parent,w,h,d,material,x,y,z,drawEdges=true) {
-    const geometry = new THREE.BoxGeometry(w,h,d);
-    const mesh = new THREE.Mesh(geometry,material);
-    mesh.position.set(x,y,z);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    parent.add(mesh);
-    if (drawEdges) {
-        const edge = new THREE.LineSegments(
-            new THREE.EdgesGeometry(geometry),
-            new THREE.LineBasicMaterial({color:0x26384a,transparent:true,opacity:.72})
-        );
-        edge.position.copy(mesh.position);
-        parent.add(edge);
-    }
-    return mesh;
-}
+            // Materials
+            concreteMat = new THREE.MeshStandardMaterial({
+                color: 0x38bdf8,
+                transparent: true,
+                opacity: concreteOpacity,
+                roughness: 0.2,
+                metalness: 0.1,
+                depthWrite: false
+            });
 
-function curveFrom(points,closed=false) {
-    return new THREE.CatmullRomCurve3(
-        points.map(p=>new THREE.Vector3(p[0],p[1],p[2])),
-        closed,"centripetal"
-    );
-}
+            mainRebarMat = new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.3, metalness: 0.7 });
+            tieRebarMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.3, metalness: 0.6 });
+            meshRebarMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.3, metalness: 0.7 });
+            perimTieMat = new THREE.MeshStandardMaterial({ color: 0xec4899, roughness: 0.3, metalness: 0.7 });
+            metallicRebarMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.25, metalness: 0.85 });
 
-function createRoundedOpenPath(points,radius) {
-    const p = points.map(v=>new THREE.Vector3(v[0],v[1],v[2]));
-    const path = new THREE.CurvePath();
-    let cursor = p[0].clone();
+            createGroundAndGrid();
 
-    for (let i=1;i<p.length-1;i++) {
-        const corner=p[i], previous=p[i-1], next=p[i+1];
-        const r=Math.min(radius,corner.distanceTo(previous)*.4,corner.distanceTo(next)*.4);
-        if (r<=.001) continue;
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
 
-        const start=corner.clone().add(previous.clone().sub(corner).normalize().multiplyScalar(r));
-        const end=corner.clone().add(next.clone().sub(corner).normalize().multiplyScalar(r));
-        if (cursor.distanceTo(start)>.001) path.add(new THREE.LineCurve3(cursor.clone(),start.clone()));
-        path.add(new THREE.QuadraticBezierCurve3(start.clone(),corner.clone(),end.clone()));
-        cursor=end.clone();
-    }
-
-    const last=p[p.length-1];
-    if (cursor.distanceTo(last)>.001) path.add(new THREE.LineCurve3(cursor,last.clone()));
-    return path;
-}
-
-function addRebar(parent,points,diameterMm,material,closed=false) {
-    const bendRadius=Math.max(diameterMm/1000*4,.01);
-    const curve=closed ? curveFrom(points,true) : createRoundedOpenPath(points,bendRadius);
-    const length=curve.getLength();
-    const geometry=new THREE.TubeGeometry(
-        curve,Math.max(48,points.length*12),diameterMm/2000,8,closed
-    );
-    const mesh=new THREE.Mesh(geometry,material);
-    mesh.castShadow=true;
-    mesh.receiveShadow=true;
-    parent.add(mesh);
-    return length;
-}
-
-function roundedLoop(halfW,halfL,radius,y) {
-    const r=Math.max(.008,Math.min(radius,halfW*.4,halfL*.4));
-    const corners=[
-        {x:halfW-r,z:-halfL+r,a0:-90,a1:0},
-        {x:halfW-r,z:halfL-r,a0:0,a1:90},
-        {x:-halfW+r,z:halfL-r,a0:90,a1:180},
-        {x:-halfW+r,z:-halfL+r,a0:180,a1:270}
-    ];
-    const points=[];
-    for (const c of corners) {
-        for (let i=0;i<=6;i++) {
-            const a=(c.a0+(c.a1-c.a0)*i/6)*Math.PI/180;
-            points.push([c.x+r*Math.cos(a),y,c.z+r*Math.sin(a)]);
-        }
-    }
-    return points;
-}
-
-function overlappingStirrupPath(halfW,halfL,y,diameterMm,requestedTail) {
-    const diameterM=diameterMm/1000;
-    const corner=Math.min(.012,halfW*.15,halfL*.15);
-    const left=-halfW+corner;
-    const right=halfW-corner;
-    const front=-halfL+corner;
-    const openingWidth=right-left;
-
-    const minimumTail=openingWidth/2+3*diameterM;
-    const tailLength=Math.min(
-        Math.max(requestedTail,minimumTail),
-        openingWidth*.75
-    );
-    const inset=Math.min(diameterM*.6,halfL*.08);
-    const tailZ=front+inset;
-
-    return [
-        [left+tailLength,y,tailZ],
-        [left,y,tailZ],
-        [left,y,front],
-        [-halfW,y,front],
-        [-halfW,y,halfL],
-        [halfW,y,halfL],
-        [halfW,y,front],
-        [right,y,front],
-        [right-tailLength,y,tailZ]
-    ];
-}
-
-function hookedBarX(x1,x2,y,z,hookHeight,diameterMm) {
-    const bend=Math.min(
-        Math.max(diameterMm*4/1000,.01),
-        Math.max(hookHeight*.35,.01),
-        (x2-x1)/5
-    );
-    return [
-        [x1,y+hookHeight,z],[x1,y+bend,z],[x1+bend,y,z],
-        [x2-bend,y,z],[x2,y+bend,z],[x2,y+hookHeight,z]
-    ];
-}
-
-function hookedBarZ(z1,z2,y,x,hookHeight,diameterMm) {
-    const bend=Math.min(
-        Math.max(diameterMm*4/1000,.01),
-        Math.max(hookHeight*.35,.01),
-        (z2-z1)/5
-    );
-    return [
-        [x,y+hookHeight,z1],[x,y+bend,z1],[x,y,z1+bend],
-        [x,y,z2-bend],[x,y+bend,z2],[x,y+hookHeight,z2]
-    ];
-}
-
-function addLine(a,b) {
-    const geometry=new THREE.BufferGeometry().setFromPoints([a,b]);
-    world.add(new THREE.Line(
-        geometry,
-        new THREE.LineBasicMaterial({color:0x536477,transparent:true,opacity:.55})
-    ));
-}
-
-[5.35,3.85,-.15,-2.35,-5.35].forEach(z=>{
-    addLine(new THREE.Vector3(-4.5,.025,z),new THREE.Vector3(4,.025,z));
-});
-[-3.5,0,3].forEach(x=>{
-    addLine(new THREE.Vector3(x,.025,6.2),new THREE.Vector3(x,.025,-6.2));
-});
-
-function addFoundation(item) {
-    const footingBottom=0;
-    const footingTop=item.t;
-    const pedestalHeight=Math.max(.1,SET.totalHeightFromFootingBottom-item.t);
-    const pedestalTop=footingTop+pedestalHeight;
-    const leanW=item.w+2*SET.leanOver;
-    const leanL=item.l+2*SET.leanOver;
-
-    const foundationLayers=new THREE.Group();
-    foundationLayers.position.set(item.x,0,item.z);
-    addBox(foundationLayers,leanW+.10,SET.sandT,leanL+.10,sandMat,
-        0,-SET.leanT-SET.sandT/2,0,false);
-    addBox(foundationLayers,leanW,SET.leanT,leanL,leanMat,
-        0,-SET.leanT/2,0,false);
-    layerGroup.add(foundationLayers);
-
-    const concrete=new THREE.Group();
-    concrete.position.set(item.x,0,item.z);
-    addBox(concrete,item.w,item.t,item.l,concreteMat.clone(),
-        0,footingBottom+item.t/2,0);
-    addBox(concrete,SET.pedestalW,pedestalHeight,SET.pedestalL,concreteMat.clone(),
-        0,footingTop+pedestalHeight/2,0);
-    concreteGroup.add(concrete);
-
-    const steel=new THREE.Group();
-    steel.position.set(item.x,0,item.z);
-
-    const innerX=item.w/2-SET.cover-item.dia/2000;
-    const innerZ=item.l/2-SET.cover-item.dia/2000;
-    const barY=footingBottom+SET.cover+item.dia/2000;
-    const barRadius=item.dia/2000;
-    
-    const maxHookHeight=Math.max(0,item.t-SET.cover-barRadius-barY);
-    const hookHeight=Math.min(SET.hookFactor*item.dia/1000,item.t*.90,maxHookHeight);
-
-    let footingBarLength=0;
-    let hookLengthTotal=0;
-
-    for (let i=0;i<item.nx;i++) {
-        const z=-innerZ+2*innerZ*i/Math.max(1,item.nx-1);
-        const length=addRebar(
-            steel,hookedBarX(-innerX,innerX,barY,z,hookHeight,item.dia),
-            item.dia,footingBarMat
-        );
-        footingBarLength+=length;
-        hookLengthTotal+=Math.max(0,length-2*innerX);
-    }
-
-    for (let i=0;i<item.ny;i++) {
-        const x=-innerX+2*innerX*i/Math.max(1,item.ny-1);
-        const length=addRebar(
-            steel,hookedBarZ(-innerZ,innerZ,barY+item.dia/1000,x,hookHeight,item.dia),
-            item.dia,footingBarMat
-        );
-        footingBarLength+=length;
-        hookLengthTotal+=Math.max(0,length-2*innerZ);
-    }
-
-    const tieHalfW=item.w/2-SET.cover-SET.tieDia/2000;
-    const tieHalfL=item.l/2-SET.cover-SET.tieDia/2000;
-    const tieY=item.t*.55;
-    const tiePoints=roundedLoop(tieHalfW,tieHalfL,SET.tieCornerRadius,tieY);
-    const tieLoopLength=addRebar(steel,tiePoints,SET.tieDia,lapBarMat,true);
-    const tieStart=tiePoints[0];
-    const tieHookLeg=Math.min(.06,tieHalfL*.30);
-    const tieRun=Math.min(Math.max(.02,SET.tieTail-tieHookLeg),tieHalfW*.65);
-    const tieTailPath=[
-        tieStart,
-        [tieStart[0]-tieRun,tieStart[1],tieStart[2]],
-        [tieStart[0]-tieRun,tieStart[1],tieStart[2]+tieHookLeg]
-    ];
-    const tieTailLength=addRebar(steel,tieTailPath,SET.tieDia,lapBarMat);
-    const tieLength=tieLoopLength+tieTailLength;
-
-    const stirrupRadius=SET.stirrupDia/2000;
-    const pedestalCover=SET.pedestalCover;
-    const stirrupHalfW=SET.pedestalW/2-pedestalCover-stirrupRadius;
-    const stirrupHalfL=SET.pedestalL/2-pedestalCover-stirrupRadius;
-
-    if (stirrupHalfW<=0 || stirrupHalfL<=0) {
-        throw new Error("ขนาดตอม่อหรือระยะหุ้มไม่พอสำหรับวางเหล็กปลอก");
-    }
-
-    const barClearance=.003;
-    const colInsetX=stirrupHalfW-stirrupRadius-item.colDia/2000-barClearance;
-    const colInsetZ=stirrupHalfL-stirrupRadius-item.colDia/2000-barClearance;
-
-    if (colInsetX<=0 || colInsetZ<=0) {
-        throw new Error("เหล็กยืนมีพื้นที่ไม่พอภายในกรอบปลอก");
-    }
-
-    const verticalTopY=pedestalTop-pedestalCover;
-    const lapLengthEach=SET.columnLapFactor*item.colDia/1000;
-    const availablePedestalHeight=verticalTopY-footingTop;
-    const actualLapLength=Math.min(
-        lapLengthEach,
-        Math.max(.05,availablePedestalHeight*.65)
-    );
-    const lapStartY=footingTop+
-        Math.max(pedestalCover,(availablePedestalHeight-actualLapLength)/2);
-    const lapEndY=lapStartY+actualLapLength;
-
-    const verticalPositions=[
-        [-colInsetX,-colInsetZ],
-        [ colInsetX,-colInsetZ],
-        [ colInsetX, colInsetZ],
-        [-colInsetX, colInsetZ]
-    ];
-
-    let verticalLength=0;
-    let totalColumnLapLength=0;
-
-    verticalPositions.forEach(([x,z],index)=>{
-        const bendRadius=Math.min(Math.max(item.colDia*4/1000,.012),item.t*.22);
-        const anchorY=footingBottom+SET.cover+item.colDia/2000;
-        
-        const requestedAnchor=SET.columnAnchorFactor*item.colDia/1000;
-        const useXDirection=index%2===0;
-        const inwardX=x>=0?-1:1;
-        const inwardZ=z>=0?-1:1;
-        const maxAnchorX=item.w/2-SET.cover-item.colDia/2000-Math.abs(x);
-        const maxAnchorZ=item.l/2-SET.cover-item.colDia/2000-Math.abs(z);
-        const anchorLength=Math.max(
-            .04,
-            Math.min(requestedAnchor,(useXDirection?maxAnchorX:maxAnchorZ)-bendRadius)
-        );
-
-        let starterPath;
-        if (useXDirection) {
-            const endX=x+inwardX*(anchorLength+bendRadius);
-            const tangentX=x+inwardX*bendRadius;
-            starterPath=[
-                [endX,anchorY,z],
-                [tangentX,anchorY,z],
-                [x,anchorY+bendRadius,z],
-                [x,lapEndY,z]
-            ];
-        } else {
-            const endZ=z+inwardZ*(anchorLength+bendRadius);
-            const tangentZ=z+inwardZ*bendRadius;
-            starterPath=[
-                [x,anchorY,endZ],
-                [x,anchorY,tangentZ],
-                [x,anchorY+bendRadius,z],
-                [x,lapEndY,z]
-            ];
+            window.addEventListener('resize', onWindowResize);
+            canvas.addEventListener('click', onCanvasClick);
         }
 
-        verticalLength+=addRebar(steel,starterPath,item.colDia,verticalBarMat);
+        // --- 3. GEOMETRY HELPERS ---
+        function createHookedBarGeometry(length, hookHeight, radius, bendRadius) {
+            const path = new THREE.CurvePath();
+            const halfL = length / 2;
+            const r = bendRadius;
+            const h = hookHeight;
 
-        const offset=Math.min(SET.spliceVisualOffset,.003);
-        const lapX=x-Math.sign(x)*offset;
-        const lapZ=z-Math.sign(z)*offset;
+            const p1 = new THREE.Vector3(-halfL, h, 0);
+            const p2 = new THREE.Vector3(-halfL, r, 0);
+            const p3 = new THREE.Vector3(-halfL + r, 0, 0);
+            const p4 = new THREE.Vector3(halfL - r, 0, 0);
+            const p5 = new THREE.Vector3(halfL, r, 0);
+            const p6 = new THREE.Vector3(halfL, h, 0);
 
-        verticalLength+=addRebar(
-            steel,
-            [[lapX,lapStartY,lapZ],[lapX,verticalTopY,lapZ]],
-            item.colDia,lapBarMat
-        );
-        totalColumnLapLength+=actualLapLength;
-    });
+            path.add(new THREE.LineCurve3(p1, p2));
+            path.add(new THREE.QuadraticBezierCurve3(p2, new THREE.Vector3(-halfL, 0, 0), p3));
+            path.add(new THREE.LineCurve3(p3, p4));
+            path.add(new THREE.QuadraticBezierCurve3(p4, new THREE.Vector3(halfL, 0, 0), p5));
+            path.add(new THREE.LineCurve3(p5, p6));
 
-    const stirrupY0=footingTop+pedestalCover+stirrupRadius;
-    const stirrupY1=pedestalTop-pedestalCover-stirrupRadius;
-    const stirrupCount=Math.max(1,Math.floor(pedestalHeight/SET.stirrupSpacing)+1);
-    let stirrupLengthTotal=0;
+            return new THREE.TubeGeometry(path, 32, radius, 6, false);
+        }
 
-    for (let i=0;i<stirrupCount;i++) {
-        const y=stirrupY0+
-            (stirrupY1-stirrupY0)*i/Math.max(1,stirrupCount-1);
+        function createLSpliceBarGeometry(straightLen, hookLen, radius, bendRadius) {
+            const path = new THREE.CurvePath();
+            const r = bendRadius;
 
-        const stirrupPath=overlappingStirrupPath(
-            stirrupHalfW,
-            stirrupHalfL,
-            y,
-            SET.stirrupDia,
-            SET.stirrupHookTail
-        );
+            const p1 = new THREE.Vector3(0, straightLen, 0);
+            const p2 = new THREE.Vector3(0, r, 0);
+            const p3 = new THREE.Vector3(r, 0, 0);
+            const p4 = new THREE.Vector3(hookLen, 0, 0);
 
-        stirrupLengthTotal+=addRebar(
-            steel,stirrupPath,SET.stirrupDia,lapBarMat
-        );
-    }
+            path.add(new THREE.LineCurve3(p1, p2));
+            path.add(new THREE.QuadraticBezierCurve3(p2, new THREE.Vector3(0, 0, 0), p3));
+            path.add(new THREE.LineCurve3(p3, p4));
 
-    steelGroup.add(steel);
+            return new THREE.TubeGeometry(path, 32, radius, 6, false);
+        }
 
-    const labelDiv=document.createElement("div");
-    labelDiv.className="grid-label";
-    labelDiv.innerHTML=`${item.id}<small>${item.name}</small>`;
-    const label=new THREE.CSS2DObject(labelDiv);
-    label.position.set(item.x,pedestalTop+.2,item.z);
-    labelGroup.add(label);
+        function createSeismicStirrup135Geometry(w, d, radius, bendRadius) {
+            const path = new THREE.CurvePath();
+            const hw = w / 2; const hd = d / 2; const r = bendRadius; const hookVal = 0.05;
 
-    const sandVolume=(leanW+.10)*(leanL+.10)*SET.sandT;
-    const leanVolume=leanW*leanL*SET.leanT;
-    const footingVolume=item.w*item.l*item.t;
-    const pedestalVolume=SET.pedestalW*SET.pedestalL*pedestalHeight;
-    const concreteVolume=footingVolume+pedestalVolume;
-    const footingSteelKg=footingBarLength*weightPerMeter(item.dia);
-    const tieSteelKg=tieLength*weightPerMeter(SET.tieDia);
-    const verticalSteelKg=verticalLength*weightPerMeter(item.colDia);
-    const stirrupSteelKg=stirrupLengthTotal*weightPerMeter(SET.stirrupDia);
-    
-    const adjustedHookLengthTotal = hookLengthTotal * 1.25; 
-    const steelKg=footingSteelKg+tieSteelKg+verticalSteelKg+stirrupSteelKg;
+            const c1_start = new THREE.Vector3(-hw + r, 0, -hd);
+            const c1_center = new THREE.Vector3(-hw, 0, -hd);
+            const c2_start = new THREE.Vector3(hw - r, 0, -hd);
+            const c2_center = new THREE.Vector3(hw, 0, -hd);
+            const c2_end = new THREE.Vector3(hw, 0, -hd + r);
+            const c3_start = new THREE.Vector3(hw, 0, hd - r);
+            const c3_center = new THREE.Vector3(hw, 0, hd);
+            const c3_end = new THREE.Vector3(hw - r, 0, hd);
+            const c4_start = new THREE.Vector3(-hw + r, 0, hd);
+            const c4_center = new THREE.Vector3(-hw, 0, hd);
+            const c4_end = new THREE.Vector3(-hw, 0, hd - r);
+            const hook1_end = new THREE.Vector3(-hw + hookVal, 0, -hd + hookVal);
 
-    return {
-        sandVolume,leanVolume,concreteVolume,
-        hookLengthTotal: adjustedHookLengthTotal,
-        tieLength,
-        columnLapLength:totalColumnLapLength + 0.15,
-        stirrupCount,steelKg,
-        steelKgWithWaste:steelKg*(1+SET.waste)
-    };
-}
+            path.add(new THREE.LineCurve3(hook1_end, c1_start));
+            path.add(new THREE.LineCurve3(c1_start, c2_start));
+            path.add(new THREE.QuadraticBezierCurve3(c2_start, c2_center, c2_end));
+            path.add(new THREE.LineCurve3(c2_end, c3_start));
+            path.add(new THREE.QuadraticBezierCurve3(c3_start, c3_center, c3_end));
+            path.add(new THREE.LineCurve3(c3_end, c4_start));
+            path.add(new THREE.QuadraticBezierCurve3(c4_start, c4_center, c4_end));
+            path.add(new THREE.LineCurve3(c4_end, new THREE.Vector3(-hw, 0, -hd + r)));
+            path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-hw, 0, -hd + r), c1_center, c1_start));
+            path.add(new THREE.LineCurve3(c1_start, new THREE.Vector3(-hw + hookVal, 0, -hd + hookVal * 0.5)));
 
-const tbody=document.getElementById("boqBody");
-const totals={concrete:0,lean:0,sand:0,hookLength:0,lapLength:0,steel:0,steelWaste:0};
+            return new THREE.TubeGeometry(path, 36, radius, 6, false);
+        }
 
-foundations.forEach(item=>{
-    const q=addFoundation(item);
-    totals.concrete+=q.concreteVolume;
-    totals.lean+=q.leanVolume;
-    totals.sand+=q.sandVolume;
-    totals.hookLength+=q.hookLengthTotal;
-    totals.lapLength+=q.columnLapLength;
-    totals.steel+=q.steelKg;
-    totals.steelWaste+=q.steelKgWithWaste;
+        function createPerimeterTieGeometry(w, d, radius, bendRadius) {
+            const path = new THREE.CurvePath();
+            const hw = w / 2; const hd = d / 2; const r = bendRadius; const overlap = 0.15;
 
-    const rebarSpec=[
-        `ฐานราก ${BAR_KIND.footing}${item.dia} (${item.nx+item.ny} เส้น: ${item.nx}+${item.ny})`,
-        `เหล็กยืนตอม่อ ${BAR_KIND.column}${item.colDia} 4 เส้น (ผูกฝากฐาน)`,
-        `เหล็กปลอกตอม่อ ${BAR_KIND.stirrup}${SET.stirrupDia} @${fmt(SET.stirrupSpacing,2)} ม. ปลายทาบ`,
-        `เหล็กรัดฐาน ${BAR_KIND.tie}${SET.tieDia}`
-    ].join("<br>");
+            const startPt = new THREE.Vector3(-hw + r, 0, -hd + 0.005);
+            const endPt = new THREE.Vector3(-hw + r + overlap, 0, -hd + 0.005);
+            const c2_start = new THREE.Vector3(hw - r, 0, -hd);
+            const c2_center = new THREE.Vector3(hw, 0, -hd);
+            const c2_end = new THREE.Vector3(hw, 0, -hd + r);
+            const c3_start = new THREE.Vector3(hw, 0, hd - r);
+            const c3_center = new THREE.Vector3(hw, 0, hd);
+            const c3_end = new THREE.Vector3(hw, 0, hd - r);
 
-    const row=document.createElement("tr");
-    row.innerHTML=`
-        <td><strong>${item.id}</strong></td>
-        <td>${item.name}</td>
-        <td>${fmt(q.concreteVolume)}</td>
-        <td>${fmt(q.sandVolume)}</td>
-        <td>${rebarSpec}</td>
-        <td>${fmt(q.hookLengthTotal,2)}</td>
-        <td>${fmt(q.columnLapLength,2)}</td>
-        <td>${fmt(q.steelKgWithWaste,1)}</td>
-    `;
-    tbody.appendChild(row);
-});
+            path.add(new THREE.LineCurve3(startPt, c2_start));
+            path.add(new THREE.QuadraticBezierCurve3(c2_start, c2_center, c2_end));
+            path.add(new THREE.LineCurve3(c2_end, c3_start));
+            path.add(new THREE.QuadraticBezierCurve3(c3_start, c3_center, c3_end));
+            path.add(new THREE.LineCurve3(c3_end, new THREE.Vector3(-hw + r, 0, hd)));
+            path.add(new THREE.LineCurve3(new THREE.Vector3(-hw + r, 0, hd), endPt));
 
-const totalRow=document.createElement("tr");
-totalRow.className="total-row";
-totalRow.innerHTML=`
-    <td colspan="2">รวม ${foundations.length} ฐาน</td>
-    <td>${fmt(totals.concrete)}</td>
-    <td>${fmt(totals.sand)}</td>
-    <td>-</td>
-    <td>${fmt(totals.hookLength,2)}</td>
-    <td>${fmt(totals.lapLength,2)}</td>
-    <td>${fmt(totals.steelWaste,1)}</td>
-`;
-tbody.appendChild(totalRow);
+            return new THREE.TubeGeometry(path, 40, radius, 6, false);
+        }
 
-document.getElementById("sumCount").textContent=`${foundations.length} ฐาน`;
-document.getElementById("sumConcrete").textContent=`${fmt(totals.concrete)} m³`;
-document.getElementById("sumLean").textContent=`${fmt(totals.lean)} m³`;
-document.getElementById("sumSand").textContent=`${fmt(totals.sand)} m³`;
-document.getElementById("sumSteel").textContent=`${fmt(totals.steel,1)} kg`;
-document.getElementById("sumSteelWaste").textContent=`${fmt(totals.steelWaste,1)} kg`;
+        // --- 4. BUILD FOUNDATION MODEL ---
+        function buildFoundationModel() {
+            clearGroup(concreteGroup);
+            clearGroup(rebarGroup);
+            clearGroup(perimTieGroup);
+            interactiveObjects = [];
 
-function setCamera(mode) {
-    camera.position.set(...(mode==="top"?[0,20,.01]:[13,13,16]));
-    controls.target.set(0,.65,0);
-    controls.update();
-}
+            const colSize = 0.20;
+            const cover = 0.04;
 
-document.getElementById("toggleConcrete").addEventListener("click",event=>{
-    concreteVisible=!concreteVisible;
-    concreteGroup.visible=concreteVisible;
-    event.currentTarget.textContent=concreteVisible?"ซ่อนคอนกรีต":"แสดงคอนกรีต";
-    event.currentTarget.classList.toggle("active",concreteVisible);
-});
-document.getElementById("toggleLayers").addEventListener("click",event=>{
-    layersVisible=!layersVisible;
-    layerGroup.visible=layersVisible;
-    event.currentTarget.textContent=layersVisible?"ซ่อนชั้นวัสดุ":"แสดงชั้นวัสดุ";
-    event.currentTarget.classList.toggle("active",layersVisible);
-});
-document.getElementById("showLabels").addEventListener("change",event=>{
-    labelGroup.visible=event.target.checked;
-});
-document.getElementById("resetCamera").addEventListener("click",()=>setCamera("iso"));
-document.getElementById("topView").addEventListener("click",()=>setCamera("top"));
-document.getElementById("isoView").addEventListener("click",()=>setCamera("iso"));
+            foundationData.forEach(item => {
+                const type = footingTypes[item.type];
+                const posX = gridX[item.xName];
+                const posZ = gridZ[item.zName];
+                const posY = type.h / 2 - 0.2;
 
-function resizeRenderer() {
-    const width=Math.max(viewer.clientWidth,1);
-    const height=Math.max(viewer.clientHeight,1);
-    renderer.setSize(width,height);
-    labelRenderer.setSize(width,height);
-    camera.aspect=width/height;
-    camera.updateProjectionMatrix();
-}
-window.addEventListener("resize",resizeRenderer);
-resizeRenderer();
+                // Concrete Footing
+                const fGeo = new THREE.BoxGeometry(type.b, type.h, type.l);
+                const fMesh = new THREE.Mesh(fGeo, concreteMat);
+                fMesh.position.set(posX, posY, posZ);
+                fMesh.castShadow = true;
+                concreteGroup.add(fMesh);
 
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene,camera);
-    labelRenderer.render(scene,camera);
-}
-animate();
-</script>
+                // Stub Column Concrete
+                const cGeo = new THREE.BoxGeometry(colSize, stubHeight, colSize);
+                const cMesh = new THREE.Mesh(cGeo, concreteMat);
+                cMesh.position.set(posX, type.h - 0.2 + stubHeight/2, posZ);
+                cMesh.castShadow = true;
+                concreteGroup.add(cMesh);
+
+                fMesh.userData = { ...item, typeData: type };
+                interactiveObjects.push(fMesh);
+
+                const rebarSubGroup = new THREE.Group();
+                const pTieSubGroup = new THREE.Group();
+
+                const meshMat = isMetallicMode ? metallicRebarMat : meshRebarMat;
+                const mainMat = isMetallicMode ? metallicRebarMat : mainRebarMat;
+                const tieMat = isMetallicMode ? metallicRebarMat : tieRebarMat;
+                const pTieMat = isMetallicMode ? metallicRebarMat : perimTieMat;
+
+                // Footing Mesh Bars
+                const meshNum = parseInt(type.meshSpec.split('+')[0]);
+                const radiusMesh = type.meshSpec.includes('DB16') ? 0.008 : 0.006;
+                const stepX = (type.b - 2 * cover) / (meshNum - 1);
+                const stepZ = (type.l - 2 * cover) / (meshNum - 1);
+                const hookH = type.h - 2 * cover;
+
+                for (let i = 0; i < meshNum; i++) {
+                    const zBar = posZ - (type.l/2 - cover) + i * stepZ;
+                    const barGeo = createHookedBarGeometry(type.b - 2*cover, hookH, radiusMesh, radiusMesh*3.5);
+                    const barMesh = new THREE.Mesh(barGeo, meshMat);
+                    barMesh.position.set(posX, -0.2 + cover, zBar);
+                    rebarSubGroup.add(barMesh);
+                }
+
+                for (let i = 0; i < meshNum; i++) {
+                    const xBar = posX - (type.b/2 - cover) + i * stepX;
+                    const barGeo = createHookedBarGeometry(type.l - 2*cover, hookH, radiusMesh, radiusMesh*3.5);
+                    const barMesh = new THREE.Mesh(barGeo, meshMat);
+                    barMesh.rotation.y = Math.PI / 2;
+                    barMesh.position.set(xBar, -0.2 + cover + radiusMesh*2, posZ);
+                    rebarSubGroup.add(barMesh);
+                }
+
+                // Perimeter Side Tie
+                const perimGeo = createPerimeterTieGeometry(type.b - 2*cover - 0.01, type.l - 2*cover - 0.01, 0.0045, 0.015);
+                const perimMesh = new THREE.Mesh(perimGeo, pTieMat);
+                perimMesh.position.set(posX, -0.2 + (type.h / 2), posZ);
+                pTieSubGroup.add(perimMesh);
+
+                // Column Dowels (Main Bars)
+                const mainNum = parseInt(type.mainBar.split('-')[0]);
+                const radiusMain = type.mainBar.includes('DB16') ? 0.008 : 0.006;
+                const innerCol = colSize/2 - 0.03;
+                const hookL = Math.max(0.20, type.b * 0.35);
+
+                const cornerPositions = [
+                    { x: posX - innerCol, z: posZ - innerCol, rot: 0 },
+                    { x: posX + innerCol, z: posZ - innerCol, rot: -Math.PI/2 },
+                    { x: posX + innerCol, z: posZ + innerCol, rot: Math.PI },
+                    { x: posX - innerCol, z: posZ + innerCol, rot: Math.PI/2 }
+                ];
+
+                cornerPositions.forEach(pos => {
+                    const colBarGeo = createLSpliceBarGeometry(stubHeight + type.h, hookL, radiusMain, radiusMain * 4);
+                    const colBarMesh = new THREE.Mesh(colBarGeo, mainMat);
+                    colBarMesh.rotation.y = pos.rot;
+                    colBarMesh.position.set(pos.x, -0.2 + cover + 0.015, pos.z);
+                    rebarSubGroup.add(colBarMesh);
+                });
+
+                // Column Stirrups
+                const tiePitch = 0.20;
+                const tieCount = Math.floor(stubHeight / tiePitch);
+                const tieWidth = colSize - 0.06;
+
+                for (let k = 0; k <= tieCount; k++) {
+                    const tieY = (-0.2 + type.h) + k * tiePitch;
+                    const tieGeo = createSeismicStirrup135Geometry(tieWidth, tieWidth, 0.003, 0.008);
+                    const tieMesh = new THREE.Mesh(tieGeo, tieMat);
+                    tieMesh.position.set(posX, tieY, posZ);
+                    rebarSubGroup.add(tieMesh);
+                }
+
+                rebarGroup.add(rebarSubGroup);
+                perimTieGroup.add(pTieSubGroup);
+            });
+        }
+
+        function createGroundAndGrid() {
+            clearGroup(gridGroup);
+            const gridHelper = new THREE.GridHelper(20, 20, 0x0284c7, 0x334155);
+            gridHelper.position.y = -0.35;
+            gridGroup.add(gridHelper);
+
+            const groundGeo = new THREE.PlaneGeometry(20, 22);
+            const groundMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.9 });
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -0.36;
+            gridGroup.add(ground);
+
+            Object.keys(gridX).forEach(k => gridGroup.add(makeGridSprite(k, gridX[k], -0.3, -7.5)));
+            Object.keys(gridZ).forEach(k => gridGroup.add(makeGridSprite(k, -6.5, -0.3, gridZ[k])));
+        }
+
+        function makeGridSprite(text, x, y, z) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0284c7';
+            ctx.beginPath(); ctx.arc(32, 32, 28, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'Bold 28px Prompt';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(text, 32, 32);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture }));
+            sprite.scale.set(1.2, 1.2, 1);
+            sprite.position.set(x, y, z);
+            return sprite;
+        }
+
+        // --- 5. BOQ CALCULATIONS (Foundations Only) ---
+        function calculateBOQ() {
+            const pSteelDB = parseFloat(document.getElementById('price-steel-db').value) || 0;
+            const pSteelRB = parseFloat(document.getElementById('price-steel-rb').value) || 0;
+            const pConc = parseFloat(document.getElementById('price-conc').value) || 0;
+            const pForm = parseFloat(document.getElementById('price-formwork').value) || 0;
+
+            let totalVolConc = 0;
+            let totalFormworkArea = 0;
+            let totalWeightDB12 = 0;
+            let totalWeightDB16 = 0;
+            let totalWeightRB9 = 0;
+
+            const breakdownData = [];
+
+            foundationData.forEach(item => {
+                const t = footingTypes[item.type];
+                const cover = 0.04;
+                const colCover = 0.03;
+
+                const volFooting = t.b * t.l * t.h;
+                const volColumn = 0.20 * 0.20 * stubHeight;
+                const footingForm = (2 * (t.b + t.l)) * t.h;
+                const columnForm = (4 * 0.20) * stubHeight;
+
+                totalVolConc += (volFooting + volColumn);
+                totalFormworkArea += (footingForm + columnForm);
+
+                // Mesh
+                const meshNum = parseInt(t.meshSpec.split('+')[0]);
+                const isDB16Mesh = t.meshSpec.includes('DB16');
+                const meshBarLen = (t.b - 2*cover) + 2 * (t.h - 2*cover);
+                const totalMeshLen = (meshNum * 2) * meshBarLen;
+
+                // Perimeter Tie
+                const perimLen = 2 * (t.b - 2*cover + t.l - 2*cover) + 0.15;
+                const wPerim = perimLen * REBAR_WEIGHT['RB9'];
+
+                // Column Main Dowels
+                const mainNum = parseInt(t.mainBar.split('-')[0]);
+                const isDB16Main = t.mainBar.includes('DB16');
+                const dowelLen = (stubHeight + t.h) + (t.b * 0.35);
+                const totalMainLen = mainNum * dowelLen;
+
+                // Stirrups
+                const tiePitch = 0.20;
+                const tieCount = Math.floor(stubHeight / tiePitch) + 1;
+                const singleTiePerimeter = 4 * (0.20 - 2*colCover) + 0.10;
+                const totalTieLen = tieCount * singleTiePerimeter;
+
+                const wMesh = totalMeshLen * (isDB16Mesh ? REBAR_WEIGHT['DB16'] : REBAR_WEIGHT['DB12']);
+                const wMain = totalMainLen * (isDB16Main ? REBAR_WEIGHT['DB16'] : REBAR_WEIGHT['DB12']);
+                const wTie = totalTieLen * REBAR_WEIGHT['RB9'];
+
+                if (isDB16Mesh) totalWeightDB16 += wMesh; else totalWeightDB12 += wMesh;
+                if (isDB16Main) totalWeightDB16 += wMain; else totalWeightDB12 += wMain;
+                totalWeightRB9 += (wTie + wPerim);
+
+                const singleTotalSteel = wMesh + wMain + wTie + wPerim;
+
+                breakdownData.push({
+                    grid: item.grid,
+                    type: item.type,
+                    dim: `${t.b.toFixed(2)}x${t.l.toFixed(2)}x${t.h.toFixed(2)}`,
+                    mesh: t.meshSpec,
+                    perim: t.perimTie,
+                    main: t.mainBar,
+                    tie: t.tieSpec,
+                    steelPerUnit: singleTotalSteel
+                });
+            });
+
+            const concWasted = totalVolConc * 1.05;
+            const db12Wasted = totalWeightDB12 * 1.10;
+            const db16Wasted = totalWeightDB16 * 1.10;
+            const rb9Wasted = totalWeightRB9 * 1.10;
+            const formWasted = totalFormworkArea * 1.05;
+
+            const totalSteelKg = db12Wasted + db16Wasted + rb9Wasted;
+
+            const items = [
+                { name: '1. คอนกรีตโครงสร้าง 240 ksc (ฐานราก + เสาตอม่อ) [เผื่อ 5%]', qty: concWasted, unit: 'ลบ.ม.', price: pConc },
+                { name: '2. เหล็กข้ออ้อย DB12 (ตะแกรงฐานราก และเดือยเสา) [เผื่อ 10%]', qty: db12Wasted, unit: 'กก.', price: pSteelDB },
+                { name: '3. เหล็กข้ออ้อย DB16 (ตะแกรงและเดือยเสาฐานรากใหญ่) [เผื่อ 10%]', qty: db16Wasted, unit: 'กก.', price: pSteelDB },
+                { name: '4. เหล็กเส้นกลม RB9 (เหล็กปลอกเสาตอม่อ + เหล็กรัดรอบฐานราก) [เผื่อ 10%]', qty: rb9Wasted, unit: 'กก.', price: pSteelRB },
+                { name: '5. ไม้แบบหล่อคอนกรีตฐานรากและเสาตอม่อ [เผื่อ 5%]', qty: formWasted, unit: 'ตร.ม.', price: pForm }
+            ];
+
+            let grandTotal = 0;
+            const tbody = document.getElementById('boq-table-body');
+            tbody.innerHTML = '';
+
+            items.forEach((item, idx) => {
+                const amount = item.qty * item.price;
+                grandTotal += amount;
+
+                const row = `
+                    <tr class="hover:bg-slate-800/50 transition">
+                        <td class="py-3 px-4 text-center font-sans text-slate-500">${idx + 1}</td>
+                        <td class="py-3 px-4 font-sans font-semibold text-slate-200">${item.name}</td>
+                        <td class="py-3 px-4 text-center text-sky-400 font-bold">${item.qty.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-center text-slate-400 font-sans">${item.unit}</td>
+                        <td class="py-3 px-4 text-right">${item.price.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
+                        <td class="py-3 px-4 text-right font-bold text-emerald-400">${amount.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('summary-steel-weight').innerText = `${totalSteelKg.toFixed(1)} kg`;
+            document.getElementById('summary-conc-vol').innerText = `${concWasted.toFixed(2)} m³`;
+            document.getElementById('summary-total-cost').innerText = `฿${grandTotal.toLocaleString('th-TH', {maximumFractionDigits: 0})}`;
+
+            document.getElementById('boq-header-steel').innerText = `${totalSteelKg.toFixed(1)} kg`;
+            document.getElementById('boq-header-conc').innerText = `${concWasted.toFixed(2)} m³`;
+            document.getElementById('boq-header-total').innerText = `฿${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+            document.getElementById('boq-grand-total').innerText = `฿${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})}`;
+
+            renderBreakdownTable(breakdownData);
+        }
+
+        function renderBreakdownTable(data) {
+            const tbody = document.getElementById('rebar-breakdown-body');
+            tbody.innerHTML = '';
+
+            const grouped = {};
+            data.forEach(d => {
+                if(!grouped[d.type]) grouped[d.type] = { count: 0, ...d };
+                grouped[d.type].count += 1;
+            });
+
+            Object.keys(grouped).forEach(k => {
+                const item = grouped[k];
+                const totalSteel = item.steelPerUnit * item.count * 1.10;
+                const row = `
+                    <tr class="hover:bg-slate-800/40">
+                        <td class="p-2.5 border border-slate-800 font-bold text-sky-400 font-sans">${item.type}</td>
+                        <td class="p-2.5 border border-slate-800">${item.dim}</td>
+                        <td class="p-2.5 border border-slate-800 font-bold text-white font-sans">${item.count}</td>
+                        <td class="p-2.5 border border-slate-800 text-amber-300">${item.mesh}</td>
+                        <td class="p-2.5 border border-slate-800 text-pink-400">${item.perim}</td>
+                        <td class="p-2.5 border border-slate-800 text-orange-400">${item.main}</td>
+                        <td class="p-2.5 border border-slate-800 text-yellow-300">${item.tie}</td>
+                        <td class="p-2.5 border border-slate-800">${item.steelPerUnit.toFixed(1)} kg</td>
+                        <td class="p-2.5 border border-slate-800 font-bold text-emerald-400">${totalSteel.toFixed(1)} kg</td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // --- 6. CONTROLS & EVENT HANDLERS ---
+        function updateConcreteOpacity(val) {
+            concreteOpacity = val / 100;
+            if(concreteMat) concreteMat.opacity = concreteOpacity;
+            document.getElementById('opacity-val').innerText = `${val}%`;
+        }
+
+        function toggleRebarMaterialMode(mode) {
+            isMetallicMode = (mode === 'metallic');
+            buildFoundationModel();
+        }
+
+        function toggleLayer(layerName, visible) {
+            if (layerName === 'rebars') rebarGroup.visible = visible;
+            if (layerName === 'perimTies') perimTieGroup.visible = visible;
+            if (layerName === 'concrete') concreteGroup.visible = visible;
+            if (layerName === 'grid') gridGroup.visible = visible;
+        }
+
+        function onCanvasClick(event) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(interactiveObjects);
+
+            if (intersects.length > 0) {
+                const data = intersects[0].object.userData;
+                const card = document.getElementById('info-card');
+                const detailsBody = document.getElementById('card-details-body');
+                const typeInfo = data.typeData;
+
+                document.getElementById('card-tag').innerText = data.type;
+                document.getElementById('card-grid').innerText = `ตำแหน่ง Grid: ${data.grid} (เสา ${data.col})`;
+
+                detailsBody.innerHTML = `
+                    <div class="flex justify-between"><span>ขนาดฐานราก:</span> <span class="font-mono text-white">${typeInfo.b.toFixed(2)} x ${typeInfo.l.toFixed(2)} x ${typeInfo.h.toFixed(2)} m</span></div>
+                    <div class="flex justify-between"><span>เหล็กตะแกรงฐานราก:</span> <span class="font-mono text-sky-300">${typeInfo.meshSpec}</span></div>
+                    <div class="flex justify-between"><span>เหล็กรัดรอบฐานราก:</span> <span class="font-mono text-pink-400">${typeInfo.perimTie}</span></div>
+                    <div class="flex justify-between"><span>เหล็กแกนเสาตอม่อ:</span> <span class="font-mono text-amber-300">${typeInfo.mainBar}</span></div>
+                    <div class="flex justify-between"><span>เหล็กปลอกเสา:</span> <span class="font-mono text-yellow-300">${typeInfo.tieSpec}</span></div>
+                    <div class="flex justify-between"><span>คอนกรีตฐานราก:</span> <span class="font-mono text-white">${(typeInfo.b * typeInfo.l * typeInfo.h).toFixed(3)} m³</span></div>
+                `;
+                card.classList.remove('hidden');
+            }
+        }
+
+        function hideInfoCard() {
+            document.getElementById('info-card').classList.add('hidden');
+        }
+
+        function onParameterChange() {
+            const valStub = parseFloat(document.getElementById('param-stub-height').value);
+            if (!isNaN(valStub) && valStub > 0) stubHeight = valStub;
+            buildFoundationModel();
+            calculateBOQ();
+        }
+
+        function switchTab(tab) {
+            const view3D = document.getElementById('view-3d');
+            const viewBOQ = document.getElementById('view-boq');
+            const btn3D = document.getElementById('tab-btn-3d');
+            const btnBOQ = document.getElementById('tab-btn-boq');
+
+            if (tab === '3d') {
+                view3D.classList.remove('hidden');
+                viewBOQ.classList.add('hidden');
+                btn3D.className = 'px-4 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow flex items-center gap-2';
+                btnBOQ.className = 'px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 border border-slate-700 flex items-center gap-2';
+                setTimeout(onWindowResize, 50);
+            } else {
+                view3D.classList.add('hidden');
+                viewBOQ.classList.remove('hidden');
+                btnBOQ.className = 'px-4 py-1.5 rounded-lg text-xs font-semibold bg-sky-600 text-white shadow flex items-center gap-2';
+                btn3D.className = 'px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-750 border border-slate-700 flex items-center gap-2';
+            }
+        }
+
+        function resetAllDefaults() {
+            document.getElementById('concrete-opacity').value = 35;
+            updateConcreteOpacity(35);
+            document.getElementById('toggle-rebars').checked = true; toggleLayer('rebars', true);
+            document.getElementById('toggle-perim-ties').checked = true; toggleLayer('perimTies', true);
+            document.getElementById('toggle-concrete').checked = true; toggleLayer('concrete', true);
+            document.getElementById('toggle-grid').checked = true; toggleLayer('grid', true);
+            document.getElementById('param-stub-height').value = 1.5;
+            stubHeight = 1.5;
+            buildFoundationModel();
+            calculateBOQ();
+        }
+
+        function clearGroup(group) {
+            while(group.children.length > 0){
+                const obj = group.children[0];
+                group.remove(obj);
+            }
+        }
+
+        function exportToCSV() {
+            let csv = '\uFEFFลำดับ,รายการวัสดุ,ปริมาณ,หน่วย,ราคา/หน่วย(บาท),จำนวนเงิน(บาท)\n';
+            const rows = document.querySelectorAll('#boq-table-body tr');
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                const rowData = Array.from(cols).map(c => `"${c.innerText.trim()}"`).join(',');
+                csv += rowData + '\n';
+            });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+            link.setAttribute('download', 'Foundation_Rebar_BOQ.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('view-3d');
+            if(!container || !renderer || !camera) return;
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            if (w === 0 || h === 0) return;
+
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (controls) controls.update();
+            if (renderer && scene && camera) renderer.render(scene, camera);
+        }
+    </script>
 </body>
 </html>
