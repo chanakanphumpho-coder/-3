@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบ 3D ถอดแบบและแสดงผลเหล็กเสริมฐานราก (Foundation Rebar BIM Visualizer & BOQ)</title>
+    <title>ระบบ 3D ถอดแบบและแสดงผลเหล็กเสริมฐานรากตามแบบวิศวกรรม (Foundation Rebar BIM & BOQ)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -46,12 +46,12 @@
             </div>
             <div>
                 <h1 class="font-bold text-base leading-tight text-white flex items-center gap-2">
-                    ระบบ 3D BIM ถอดแบบและแสดงผลเหล็กเสริมโครงสร้างฐานราก
+                    ระบบ 3D BIM ถอดแบบและแสดงผลเหล็กเสริมโครงสร้างฐานราก (ตามแบบวิศวกรรม)
                     <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-normal">
-                        <i class="fa-solid fa-check-double text-[9px] mr-1"></i>Foundation & Stub Column Standard
+                        <i class="fa-solid fa-check-double text-[9px] mr-1"></i>Engineering Standard Details
                     </span>
                 </h1>
-                <p class="text-xs text-slate-400">เฉพาะงานฐานราก 14 ตำแหน่ง, เสาตอม่อ, เหล็กตะแกรง, เหล็กรัดรอบ และเหล็กเดือยเสา</p>
+                <p class="text-xs text-slate-400">ครบถ้วน 6 ขนาดฐานราก, เสาตอม่อ และเหล็กรัดรอบด้านใน</p>
             </div>
         </div>
         <div class="flex items-center space-x-3">
@@ -113,7 +113,7 @@
                             <input type="checkbox" id="toggle-perim-ties" checked onchange="toggleLayer('perimTies', this.checked)" class="accent-pink-500 w-4 h-4 rounded">
                         </label>
                         <label class="flex items-center justify-between p-2 rounded-lg bg-slate-800 hover:bg-slate-750 cursor-pointer border border-slate-700/50">
-                            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-cube text-sky-400"></i> เนื้อคอนกรีตฐานราก & ตอม่อ</span>
+                            <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-cube text-sky-400"></i> คอนกรีตฐานราก & ตอม่อ</span>
                             <input type="checkbox" id="toggle-concrete" checked onchange="toggleLayer('concrete', this.checked)" class="accent-sky-500 w-4 h-4 rounded">
                         </label>
                         <label class="flex items-center justify-between p-2 rounded-lg bg-slate-800 hover:bg-slate-750 cursor-pointer border border-slate-700/50">
@@ -178,12 +178,12 @@
                 <!-- Realtime Top Summary -->
                 <div class="flex items-center space-x-6 text-xs">
                     <div>
-                        <span class="text-slate-400 block text-[10px]">น้ำหนักเหล็กฐานราก+ตอม่อ</span>
+                        <span class="text-slate-400 block text-[10px]">น้ำหนักเหล็กเสริมรวม</span>
                         <span id="summary-steel-weight" class="font-bold text-amber-400 font-mono text-sm">0.00 kg</span>
                     </div>
                     <div class="border-r border-slate-800 h-6"></div>
                     <div>
-                        <span class="text-slate-400 block text-[10px]">คอนกรีตรวม (ผัด 5%)</span>
+                        <span class="text-slate-400 block text-[10px]">คอนกรีตฐานราก+ตอม่อ</span>
                         <span id="summary-conc-vol" class="font-bold text-sky-400 font-mono text-sm">0.00 m³</span>
                     </div>
                     <div class="border-r border-slate-800 h-6"></div>
@@ -201,13 +201,13 @@
                 <!-- Legend Box -->
                 <div class="absolute top-4 left-4 glass-panel p-3.5 rounded-xl shadow-2xl text-xs max-w-xs space-y-2 pointer-events-none">
                     <div class="font-bold text-slate-100 flex items-center gap-2 border-b border-slate-700/50 pb-1.5">
-                        <i class="fa-solid fa-shield-halved text-emerald-400"></i> มาตรฐานดัดงอเหล็กฐานราก (Details)
+                        <i class="fa-solid fa-shield-halved text-emerald-400"></i> มาตรฐานดัดงอเหล็กตามแบบวิศวกรรม
                     </div>
                     <div class="space-y-1.5 text-[11px] text-slate-300">
                         <div class="flex items-center justify-between"><span class="text-amber-400 font-semibold">เหล็กปลอกเสา:</span> <span>งอขอ 135° Seismic Hook</span></div>
                         <div class="flex items-center justify-between"><span class="text-orange-400 font-semibold">เหล็กเดือยเสา:</span> <span>งอฉากเท้าเป็ด 90° L-Splice</span></div>
-                        <div class="flex items-center justify-between"><span class="text-sky-400 font-semibold">เหล็กฐานราก:</span> <span>งอดัดขึ้นฉาก 90° (12d_b)</span></div>
-                        <div class="flex items-center justify-between"><span class="text-pink-400 font-semibold">เหล็กรัดรอบ:</span> <span>เหล็กรัดขอบฐานราก RB9</span></div>
+                        <div class="flex items-center justify-between"><span class="text-sky-400 font-semibold">เหล็กตะแกรงฐานราก:</span> <span>งอดัดขึ้นฉาก 90° ภายใน Cover</span></div>
+                        <div class="flex items-center justify-between"><span class="text-pink-400 font-semibold">เหล็กรัดรอบ:</span> <span>รัดอยู่ด้านในคอนกรีตฐานรากถูกต้อง</span></div>
                     </div>
                 </div>
 
@@ -215,7 +215,7 @@
                 <div id="info-card" class="hidden absolute bottom-6 left-6 glass-panel p-4 rounded-xl shadow-2xl border border-sky-500/40 text-xs w-80 transition-all z-20">
                     <div class="flex justify-between items-start mb-2">
                         <div>
-                            <span id="card-tag" class="bg-orange-600 text-white font-bold text-[10px] px-2 py-0.5 rounded">F1.30x1.30</span>
+                            <span id="card-tag" class="bg-orange-600 text-white font-bold text-[10px] px-2 py-0.5 rounded">F1.00x1.00</span>
                             <h3 id="card-grid" class="font-bold text-white text-sm mt-1">Grid Position: D1</h3>
                         </div>
                         <button onclick="hideInfoCard()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-base"></i></button>
@@ -236,11 +236,11 @@
                             <h2 class="text-lg font-bold text-white flex items-center gap-2">
                                 <i class="fa-solid fa-file-invoice-dollar text-emerald-400"></i> ใบถอดแบบและประเมินราคาเหล็กเสริม & คอนกรีตฐานราก (BOQ)
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">เฉพาะหมวดงานฐานราก 14 ตำแหน่ง และเสาตอม่อ คำนวณจากความยาวเหล็กจริง + ระยะงอขอฉาก + เหล็กรัดรอบ + เผื่อสูญเสีย</p>
+                            <p class="text-xs text-slate-400 mt-1">อ้างอิงตามแบบแปลนวิศวกรรมครบถ้วน (เฉพาะโครงสร้างฐานรากและเสาตอม่อ)</p>
                         </div>
                         <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex gap-6 text-center">
                             <div>
-                                <div class="text-[10px] text-slate-400">เหล็กฐานรากรวม (Kg)</div>
+                                <div class="text-[10px] text-slate-400">เหล็กเสริมรวม (Kg)</div>
                                 <div id="boq-header-steel" class="text-sm font-bold text-amber-400 font-mono">0.00 kg</div>
                             </div>
                             <div class="border-r border-slate-800"></div>
@@ -260,7 +260,7 @@
                     <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden">
                         <div class="px-6 py-3.5 border-b border-slate-800 flex justify-between items-center bg-slate-900/60">
                             <h3 class="font-bold text-slate-200 text-xs flex items-center gap-2">
-                                <i class="fa-solid fa-list-check text-sky-400"></i> สรุปรายการวัสดุและประมาณการค่าใช้จ่าย (เฉพาะฐานราก & ตอม่อ)
+                                <i class="fa-solid fa-list-check text-sky-400"></i> สรุปรายการวัสดุและประมาณการค่าใช้จ่ายตามแบบวิศวกรรม
                             </h3>
                             <span class="text-[11px] text-slate-400">สกุลเงิน: บาท (THB)</span>
                         </div>
@@ -282,7 +282,7 @@
                                 </tbody>
                                 <tfoot>
                                     <tr class="bg-slate-800/90 font-bold text-slate-100 border-t-2 border-slate-700">
-                                        <td colspan="5" class="py-4 px-4 text-right font-sans">รวมงบประมาณฐานรากและเสาตอม่อสุทธิ:</td>
+                                        <td colspan="5" class="py-4 px-4 text-right font-sans">รวมงบประมาณโครงสร้างฐานรากสุทธิ:</td>
                                         <td id="boq-grand-total" class="py-4 px-4 text-right text-emerald-400 font-extrabold text-base font-mono">฿0.00</td>
                                     </tr>
                                 </tfoot>
@@ -293,7 +293,7 @@
                     <!-- Detailed Rebar Breakdown Table -->
                     <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 space-y-4">
                         <h3 class="font-bold text-slate-200 text-xs flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-amber-400"></i> ตารางรายละเอียดถอดแบบเหล็กเสริมแยกรายประเภทฐานราก (Detailed Rebar Schedule)
+                            <i class="fa-solid fa-layer-group text-amber-400"></i> ตารางรายละเอียดถอดแบบเหล็กเสริมแยกรายประเภท (Detailed Rebar Schedule)
                         </h3>
                         <div class="overflow-x-auto">
                             <table class="w-full text-xs text-center border border-slate-800">
@@ -302,12 +302,12 @@
                                         <th class="p-2.5 border border-slate-700">ฐานราก</th>
                                         <th class="p-2.5 border border-slate-700">ขนาด BxLxH (ม.)</th>
                                         <th class="p-2.5 border border-slate-700">จำนวน</th>
-                                        <th class="p-2.5 border border-slate-700">เหล็กตะแกรงฐานราก</th>
-                                        <th class="p-2.5 border border-slate-700">เหล็กรัดรอบ (Side Tie)</th>
+                                        <th class="p-2.5 border border-slate-700">เหล็กตะแกรงฐานราก (รวมงอปลาย)</th>
+                                        <th class="p-2.5 border border-slate-700">เหล็กรัดรอบขอบ (Side Tie)</th>
                                         <th class="p-2.5 border border-slate-700">เหล็กแกนเสา (Dowels)</th>
                                         <th class="p-2.5 border border-slate-700">เหล็กปลอกเสา (RB9)</th>
-                                        <th class="p-2.5 border border-slate-700">น้ำหนักเหล็ก/ฐาน (กก.)</th>
-                                        <th class="p-2.5 border border-slate-700">น้ำหนักเหล็กเขตรวม (กก.)</th>
+                                        <th class="p-2.5 border border-slate-700">น้ำหนัก/ฐาน (กก.)</th>
+                                        <th class="p-2.5 border border-slate-700">น้ำหนักรวม (กก.)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="rebar-breakdown-body" class="divide-y divide-slate-800 font-mono text-slate-300">
@@ -324,7 +324,7 @@
     </div>
 
     <script>
-        // --- 1. DATA DEFINITION (Foundations Only) ---
+        // --- 1. DATA DEFINITION (Full 6 Foundation Types according to Drawing) ---
         const gridX = { '1': -3.25, '2': 0.25, '3': 3.25 };
         const gridZ = { 'A': 5.35, 'B': 3.85, 'C': -0.15, 'D': -2.35, 'E': -5.35 };
 
@@ -336,18 +336,18 @@
         };
 
         const footingTypes = {
-            'F0.60x0.60': { b: 0.60, l: 0.60, h: 0.20, meshSpec: '4+4 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15' },
-            'F0.90x0.90': { b: 0.90, l: 0.90, h: 0.20, meshSpec: '5+5 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15' },
-            'F1.00x1.00': { b: 1.00, l: 1.00, h: 0.20, meshSpec: '5+5 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15' },
-            'F1.30x1.30': { b: 1.30, l: 1.30, h: 0.25, meshSpec: '7+7 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15' },
-            'F1.40x1.40': { b: 1.40, l: 1.40, h: 0.25, meshSpec: '6+6 DB16', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB16', tieSpec: 'RB9@0.15' },
-            'F1.50x1.50': { b: 1.50, l: 1.50, h: 0.30, meshSpec: '7+7 DB16', perimTie: '1-RB9 รัดรอบ', mainBar: '6-DB16', tieSpec: 'RB9@0.15' }
+            'F0.60x0.60': { b: 0.60, l: 0.60, h: 0.20, meshSpec: '4+4 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15', hookLen: '0.10ม.' },
+            'F0.80x0.80': { b: 0.80, l: 0.80, h: 0.20, meshSpec: '4+4 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15', hookLen: '0.10ม.' },
+            'F1.00x1.00': { b: 1.00, l: 1.00, h: 0.20, meshSpec: '5+5 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15', hookLen: '0.10ม.' },
+            'F1.30x1.30': { b: 1.30, l: 1.30, h: 0.25, meshSpec: '7+7 DB12', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB12', tieSpec: 'RB9@0.15', hookLen: '0.15ม.' },
+            'F1.40x1.40': { b: 1.40, l: 1.40, h: 0.25, meshSpec: '6+6 DB16', perimTie: '1-RB9 รัดรอบ', mainBar: '4-DB16', tieSpec: 'RB9@0.15', hookLen: '0.15ม.' },
+            'F1.50x1.50': { b: 1.50, l: 1.50, h: 0.30, meshSpec: '7+7 DB16', perimTie: '1-RB9 รัดรอบ', mainBar: '6-DB16', tieSpec: 'RB9@0.15', hookLen: '0.20ม.' }
         };
 
         const foundationData = [
-            { grid: 'E1', type: 'F0.90x0.90', col: 'C1A', xName: '1', zName: 'E' },
+            { grid: 'E1', type: 'F0.80x0.80', col: 'C1A', xName: '1', zName: 'E' },
             { grid: 'E2', type: 'F1.00x1.00', col: 'C1A', xName: '2', zName: 'E' },
-            { grid: 'E3', type: 'F0.90x0.90', col: 'C1A', xName: '3', zName: 'E' },
+            { grid: 'E3', type: 'F0.80x0.80', col: 'C1A', xName: '3', zName: 'E' },
             { grid: 'D1', type: 'F1.30x1.30', col: 'C1',  xName: '1', zName: 'D' },
             { grid: 'D2', type: 'F1.40x1.40', col: 'C1',  xName: '2', zName: 'D' },
             { grid: 'D3', type: 'F1.30x1.30', col: 'C1',  xName: '3', zName: 'D' },
@@ -356,7 +356,7 @@
             { grid: 'C3', type: 'F1.30x1.30', col: 'C1',  xName: '3', zName: 'C' },
             { grid: 'B1', type: 'F1.30x1.30', col: 'C1',  xName: '1', zName: 'B' },
             { grid: 'B2', type: 'F1.30x1.30', col: 'C1',  xName: '2', zName: 'B' },
-            { grid: 'B3', type: 'F0.90x0.90', col: 'C1',  xName: '3', zName: 'B' },
+            { grid: 'B3', type: 'F0.80x0.80', col: 'C1',  xName: '3', zName: 'B' },
             { grid: 'A1', type: 'F0.60x0.60', col: 'C1',  xName: '1', zName: 'A' },
             { grid: 'A2', type: 'F0.60x0.60', col: 'C1',  xName: '2', zName: 'A' }
         ];
@@ -513,27 +513,24 @@
             return new THREE.TubeGeometry(path, 36, radius, 6, false);
         }
 
-        function createPerimeterTieGeometry(w, d, radius, bendRadius) {
+        function createPerimeterTieInboundGeometry(w, d, radius, cornerRadius) {
             const path = new THREE.CurvePath();
-            const hw = w / 2; const hd = d / 2; const r = bendRadius; const overlap = 0.15;
+            const hw = w / 2; 
+            const hd = d / 2;
+            const r = cornerRadius;
+            const overlap = 0.15;
 
-            const startPt = new THREE.Vector3(-hw + r, 0, -hd + 0.005);
-            const endPt = new THREE.Vector3(-hw + r + overlap, 0, -hd + 0.005);
-            const c2_start = new THREE.Vector3(hw - r, 0, -hd);
-            const c2_center = new THREE.Vector3(hw, 0, -hd);
-            const c2_end = new THREE.Vector3(hw, 0, -hd + r);
-            const c3_start = new THREE.Vector3(hw, 0, hd - r);
-            const c3_center = new THREE.Vector3(hw, 0, hd);
-            const c3_end = new THREE.Vector3(hw, 0, hd - r);
+            path.add(new THREE.LineCurve3(new THREE.Vector3(-hw + r + overlap, 0, -hd), new THREE.Vector3(hw - r, 0, -hd)));
+            path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(hw - r, 0, -hd), new THREE.Vector3(hw, 0, -hd), new THREE.Vector3(hw, 0, -hd + r)));
+            path.add(new THREE.LineCurve3(new THREE.Vector3(hw, 0, -hd + r), new THREE.Vector3(hw, 0, hd - r)));
+            path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(hw, 0, hd - r), new THREE.Vector3(hw, 0, hd), new THREE.Vector3(hw - r, 0, hd)));
+            path.add(new THREE.LineCurve3(new THREE.Vector3(hw - r, 0, hd), new THREE.Vector3(-hw + r, 0, hd)));
+            path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-hw + r, 0, hd), new THREE.Vector3(-hw, 0, hd), new THREE.Vector3(-hw, 0, hd - r)));
+            path.add(new THREE.LineCurve3(new THREE.Vector3(-hw, 0, hd - r), new THREE.Vector3(-hw, 0, -hd + r)));
+            path.add(new THREE.QuadraticBezierCurve3(new THREE.Vector3(-hw, 0, -hd + r), new THREE.Vector3(-hw, 0, -hd), new THREE.Vector3(-hw + r, 0, -hd)));
+            path.add(new THREE.LineCurve3(new THREE.Vector3(-hw + r, 0, -hd), new THREE.Vector3(-hw + r + overlap, 0, -hd)));
 
-            path.add(new THREE.LineCurve3(startPt, c2_start));
-            path.add(new THREE.QuadraticBezierCurve3(c2_start, c2_center, c2_end));
-            path.add(new THREE.LineCurve3(c2_end, c3_start));
-            path.add(new THREE.QuadraticBezierCurve3(c3_start, c3_center, c3_end));
-            path.add(new THREE.LineCurve3(c3_end, new THREE.Vector3(-hw + r, 0, hd)));
-            path.add(new THREE.LineCurve3(new THREE.Vector3(-hw + r, 0, hd), endPt));
-
-            return new THREE.TubeGeometry(path, 40, radius, 6, false);
+            return new THREE.TubeGeometry(path, 64, radius, 6, false);
         }
 
         // --- 4. BUILD FOUNDATION MODEL ---
@@ -552,14 +549,14 @@
                 const posZ = gridZ[item.zName];
                 const posY = type.h / 2 - 0.2;
 
-                // Concrete Footing
+                // 1. Concrete Footing
                 const fGeo = new THREE.BoxGeometry(type.b, type.h, type.l);
                 const fMesh = new THREE.Mesh(fGeo, concreteMat);
                 fMesh.position.set(posX, posY, posZ);
                 fMesh.castShadow = true;
                 concreteGroup.add(fMesh);
 
-                // Stub Column Concrete
+                // 2. Stub Column Concrete
                 const cGeo = new THREE.BoxGeometry(colSize, stubHeight, colSize);
                 const cMesh = new THREE.Mesh(cGeo, concreteMat);
                 cMesh.position.set(posX, type.h - 0.2 + stubHeight/2, posZ);
@@ -579,10 +576,11 @@
 
                 // Footing Mesh Bars
                 const meshNum = parseInt(type.meshSpec.split('+')[0]);
-                const radiusMesh = type.meshSpec.includes('DB16') ? 0.008 : 0.006;
+                const isDB16 = type.meshSpec.includes('DB16');
+                const radiusMesh = isDB16 ? 0.008 : 0.006;
                 const stepX = (type.b - 2 * cover) / (meshNum - 1);
                 const stepZ = (type.l - 2 * cover) / (meshNum - 1);
-                const hookH = type.h - 2 * cover;
+                const hookH = type.h === 0.30 ? 0.20 : (type.h === 0.25 ? 0.15 : 0.10);
 
                 for (let i = 0; i < meshNum; i++) {
                     const zBar = posZ - (type.l/2 - cover) + i * stepZ;
@@ -601,8 +599,9 @@
                     rebarSubGroup.add(barMesh);
                 }
 
-                // Perimeter Side Tie
-                const perimGeo = createPerimeterTieGeometry(type.b - 2*cover - 0.01, type.l - 2*cover - 0.01, 0.0045, 0.015);
+                // Perimeter Side Tie (วางอยู่ด้านในคอนกรีตฐานรากอย่างถูกต้อง)
+                const innerMargin = cover + 0.01;
+                const perimGeo = createPerimeterTieInboundGeometry(type.b - 2*innerMargin, type.l - 2*innerMargin, 0.0045, 0.03);
                 const perimMesh = new THREE.Mesh(perimGeo, pTieMat);
                 perimMesh.position.set(posX, -0.2 + (type.h / 2), posZ);
                 pTieSubGroup.add(perimMesh);
@@ -681,7 +680,7 @@
             return sprite;
         }
 
-        // --- 5. BOQ CALCULATIONS (Foundations Only) ---
+        // --- 5. BOQ CALCULATIONS ---
         function calculateBOQ() {
             const pSteelDB = parseFloat(document.getElementById('price-steel-db').value) || 0;
             const pSteelRB = parseFloat(document.getElementById('price-steel-rb').value) || 0;
@@ -703,29 +702,27 @@
 
                 const volFooting = t.b * t.l * t.h;
                 const volColumn = 0.20 * 0.20 * stubHeight;
+
                 const footingForm = (2 * (t.b + t.l)) * t.h;
                 const columnForm = (4 * 0.20) * stubHeight;
 
                 totalVolConc += (volFooting + volColumn);
                 totalFormworkArea += (footingForm + columnForm);
 
-                // Mesh
                 const meshNum = parseInt(t.meshSpec.split('+')[0]);
                 const isDB16Mesh = t.meshSpec.includes('DB16');
-                const meshBarLen = (t.b - 2*cover) + 2 * (t.h - 2*cover);
+                const hookVal = t.h === 0.30 ? 0.20 : (t.h === 0.25 ? 0.15 : 0.10);
+                const meshBarLen = (t.b - 2*cover) + (2 * hookVal);
                 const totalMeshLen = (meshNum * 2) * meshBarLen;
 
-                // Perimeter Tie
                 const perimLen = 2 * (t.b - 2*cover + t.l - 2*cover) + 0.15;
                 const wPerim = perimLen * REBAR_WEIGHT['RB9'];
 
-                // Column Main Dowels
                 const mainNum = parseInt(t.mainBar.split('-')[0]);
                 const isDB16Main = t.mainBar.includes('DB16');
                 const dowelLen = (stubHeight + t.h) + (t.b * 0.35);
                 const totalMainLen = mainNum * dowelLen;
 
-                // Stirrups
                 const tiePitch = 0.20;
                 const tieCount = Math.floor(stubHeight / tiePitch) + 1;
                 const singleTiePerimeter = 4 * (0.20 - 2*colCover) + 0.10;
@@ -745,7 +742,7 @@
                     grid: item.grid,
                     type: item.type,
                     dim: `${t.b.toFixed(2)}x${t.l.toFixed(2)}x${t.h.toFixed(2)}`,
-                    mesh: t.meshSpec,
+                    mesh: `${t.meshSpec} (งอ ${t.hookLen})`,
                     perim: t.perimTie,
                     main: t.mainBar,
                     tie: t.tieSpec,
@@ -763,9 +760,9 @@
 
             const items = [
                 { name: '1. คอนกรีตโครงสร้าง 240 ksc (ฐานราก + เสาตอม่อ) [เผื่อ 5%]', qty: concWasted, unit: 'ลบ.ม.', price: pConc },
-                { name: '2. เหล็กข้ออ้อย DB12 (ตะแกรงฐานราก และเดือยเสา) [เผื่อ 10%]', qty: db12Wasted, unit: 'กก.', price: pSteelDB },
-                { name: '3. เหล็กข้ออ้อย DB16 (ตะแกรงและเดือยเสาฐานรากใหญ่) [เผื่อ 10%]', qty: db16Wasted, unit: 'กก.', price: pSteelDB },
-                { name: '4. เหล็กเส้นกลม RB9 (เหล็กปลอกเสาตอม่อ + เหล็กรัดรอบฐานราก) [เผื่อ 10%]', qty: rb9Wasted, unit: 'กก.', price: pSteelRB },
+                { name: '2. เหล็กข้ออ้อย DB12 (ตะแกรงฐานรากพร้อมงอฉากและเดือยเสา) [เผื่อ 10%]', qty: db12Wasted, unit: 'กก.', price: pSteelDB },
+                { name: '3. เหล็กข้ออ้อย DB16 (ตะแกรงฐานรากใหญ่และเดือยเสา) [เผื่อ 10%]', qty: db16Wasted, unit: 'กก.', price: pSteelDB },
+                { name: '4. เหล็กเส้นกลม RB9 (เหล็กปลอกเสาตอม่อ + เหล็กรัดรอบขอบฐานรากด้านใน) [เผื่อ 10%]', qty: rb9Wasted, unit: 'กก.', price: pSteelRB },
                 { name: '5. ไม้แบบหล่อคอนกรีตฐานรากและเสาตอม่อ [เผื่อ 5%]', qty: formWasted, unit: 'ตร.ม.', price: pForm }
             ];
 
@@ -870,11 +867,10 @@
 
                 detailsBody.innerHTML = `
                     <div class="flex justify-between"><span>ขนาดฐานราก:</span> <span class="font-mono text-white">${typeInfo.b.toFixed(2)} x ${typeInfo.l.toFixed(2)} x ${typeInfo.h.toFixed(2)} m</span></div>
-                    <div class="flex justify-between"><span>เหล็กตะแกรงฐานราก:</span> <span class="font-mono text-sky-300">${typeInfo.meshSpec}</span></div>
-                    <div class="flex justify-between"><span>เหล็กรัดรอบฐานราก:</span> <span class="font-mono text-pink-400">${typeInfo.perimTie}</span></div>
+                    <div class="flex justify-between"><span>เหล็กตะแกรง (งอปลาย):</span> <span class="font-mono text-sky-300">${typeInfo.meshSpec} (งอ ${typeInfo.hookLen})</span></div>
+                    <div class="flex justify-between"><span>เหล็กรัดรอบขอบ:</span> <span class="font-mono text-pink-400">${typeInfo.perimTie} (ด้านใน)</span></div>
                     <div class="flex justify-between"><span>เหล็กแกนเสาตอม่อ:</span> <span class="font-mono text-amber-300">${typeInfo.mainBar}</span></div>
                     <div class="flex justify-between"><span>เหล็กปลอกเสา:</span> <span class="font-mono text-yellow-300">${typeInfo.tieSpec}</span></div>
-                    <div class="flex justify-between"><span>คอนกรีตฐานราก:</span> <span class="font-mono text-white">${(typeInfo.b * typeInfo.l * typeInfo.h).toFixed(3)} m³</span></div>
                 `;
                 card.classList.remove('hidden');
             }
@@ -942,7 +938,7 @@
 
             const link = document.createElement('a');
             link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-            link.setAttribute('download', 'Foundation_Rebar_BOQ.csv');
+            link.setAttribute('download', 'Foundation_Engineering_BOQ.csv');
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
